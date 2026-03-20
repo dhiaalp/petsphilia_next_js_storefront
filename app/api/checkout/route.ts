@@ -61,44 +61,70 @@ export async function POST(req: NextRequest) {
       if (meta.custom_mockup) orderMeta[`${prefix}product_mockup`] = meta.custom_mockup;
     });
 
-    await medusaFetch(`/store/carts/${cartId}`, {
-      method: "POST",
-      body: JSON.stringify({
-        email,
-        metadata: orderMeta,
-        shipping_address: {
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          address_1: address,
-          city,
-          country_code: country || "ae",
-        },
-        billing_address: {
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          address_1: address,
-          city,
-          country_code: country || "ae",
-        },
-      }),
-    });
+    try {
+      await medusaFetch(`/store/carts/${cartId}`, {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          metadata: orderMeta,
+          shipping_address: {
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            address_1: address,
+            city,
+            country_code: country || "ae",
+          },
+          billing_address: {
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+            address_1: address,
+            city,
+            country_code: country || "ae",
+          },
+        }),
+      });
+    } catch (err) {
+      throw new Error(
+        `Failed to update cart addresses: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
 
-    const shippingRes = await medusaFetch(`/store/shipping-options?cart_id=${cartId}`);
+    let shippingRes;
+    try {
+      shippingRes = await medusaFetch(`/store/shipping-options?cart_id=${cartId}`);
+    } catch (err) {
+      throw new Error(
+        `Failed to load shipping options: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
     const shippingOptions = shippingRes.shipping_options ?? [];
 
     if (shippingOptions.length > 0) {
-      await medusaFetch(`/store/carts/${cartId}/shipping-methods`, {
-        method: "POST",
-        body: JSON.stringify({ option_id: shippingOptions[0].id }),
-      });
+      try {
+        await medusaFetch(`/store/carts/${cartId}/shipping-methods`, {
+          method: "POST",
+          body: JSON.stringify({ option_id: shippingOptions[0].id }),
+        });
+      } catch (err) {
+        throw new Error(
+          `Failed to apply shipping method: ${err instanceof Error ? err.message : "Unknown error"}`,
+        );
+      }
     }
 
-    const payColRes = await medusaFetch(`/store/payment-collections`, {
-      method: "POST",
-      body: JSON.stringify({ cart_id: cartId }),
-    });
+    let payColRes;
+    try {
+      payColRes = await medusaFetch(`/store/payment-collections`, {
+        method: "POST",
+        body: JSON.stringify({ cart_id: cartId }),
+      });
+    } catch (err) {
+      throw new Error(
+        `Failed to create payment collection: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
 
     const payColId = payColRes.payment_collection?.id;
 
@@ -106,15 +132,29 @@ export async function POST(req: NextRequest) {
       throw new Error("Unable to initialize payment collection");
     }
 
-    const paymentSessionRes = await medusaFetch(
-      `/store/payment-collections/${payColId}/payment-sessions`,
-      {
-        method: "POST",
-        body: JSON.stringify({ provider_id: STRIPE_PROVIDER_ID }),
-      },
-    );
+    let paymentSessionRes;
+    try {
+      paymentSessionRes = await medusaFetch(
+        `/store/payment-collections/${payColId}/payment-sessions`,
+        {
+          method: "POST",
+          body: JSON.stringify({ provider_id: STRIPE_PROVIDER_ID }),
+        },
+      );
+    } catch (err) {
+      throw new Error(
+        `Failed to create Stripe payment session: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
 
-    const refreshedCart = await medusaFetch(`/store/carts/${cartId}`);
+    let refreshedCart;
+    try {
+      refreshedCart = await medusaFetch(`/store/carts/${cartId}`);
+    } catch (err) {
+      throw new Error(
+        `Failed to refresh cart after Stripe session creation: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
 
     const session =
       refreshedCart.cart?.payment_collection?.payment_sessions?.find(
