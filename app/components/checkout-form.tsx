@@ -26,6 +26,10 @@ type Receipt = {
   total: number;
 };
 
+function isCompletedStripeStatus(status?: string | null) {
+  return status === "succeeded" || status === "requires_capture";
+}
+
 const cardElementOptions = {
   style: {
     base: {
@@ -374,7 +378,7 @@ function StripeCardFields({
         throw new Error(error.message || "Wallet payment confirmation failed");
       }
 
-      if (paymentIntent?.status !== "succeeded") {
+      if (!isCompletedStripeStatus(paymentIntent?.status)) {
         throw new Error("Payment was not completed. Please try again.");
       }
 
@@ -425,7 +429,7 @@ function StripeCardFields({
         throw new Error(error.message || "Payment confirmation failed");
       }
 
-      if (paymentIntent?.status !== "succeeded") {
+      if (!isCompletedStripeStatus(paymentIntent?.status)) {
         throw new Error("Payment was not completed. Please try again.");
       }
 
