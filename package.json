@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.888.0",
     "@medusajs/js-sdk": "^2.11.1",
     "clsx": "^2.1.1",
     "next": "15.5.10",
