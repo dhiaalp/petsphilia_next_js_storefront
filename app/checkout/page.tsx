@@ -37,10 +37,6 @@ export default async function CheckoutPage() {
     );
   }
 
-  // Build order summary
-  const SHIPPING_COST = 15;
-  const FREE_SHIPPING_THRESHOLD = 150;
-
   const orderItems: { title: string; variant: string; price: string; thumb?: string }[] = [];
   let subtotal = 0;
 
@@ -67,13 +63,24 @@ export default async function CheckoutPage() {
     }
   }
 
-  const freeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
-  const shippingCost = freeShipping ? 0 : SHIPPING_COST;
-  const total = subtotal + shippingCost;
   const currencyCode = cart?.currency_code ?? "aed";
-  const subtotalDisplay = hasMedusaItems ? formatMoney(subtotal, currencyCode) : `AED ${subtotal}`;
-  const shippingDisplay = freeShipping ? "FREE" : `AED ${shippingCost}`;
-  const totalDisplay = hasMedusaItems ? formatMoney(total, currencyCode) : `AED ${total}`;
+  const medusaSubtotal = cart?.subtotal ?? subtotal;
+  const medusaShippingTotal = cart?.shipping_total ?? 0;
+  const medusaTotal = cart?.total ?? medusaSubtotal + medusaShippingTotal;
+  const hasShippingMethod = Boolean(cart?.shipping_methods?.length);
+  const subtotalDisplay = hasMedusaItems
+    ? formatMoney(medusaSubtotal, currencyCode)
+    : `AED ${subtotal}`;
+  const shippingDisplay = hasMedusaItems
+    ? hasShippingMethod
+      ? formatMoney(medusaShippingTotal, currencyCode)
+      : "Calculated after address"
+    : "Calculated at payment";
+  const totalDisplay = hasMedusaItems
+    ? hasShippingMethod
+      ? formatMoney(medusaTotal, currencyCode)
+      : formatMoney(medusaSubtotal, currencyCode)
+    : `AED ${subtotal}`;
 
   return (
     <main className="checkout-page">
@@ -120,13 +127,13 @@ export default async function CheckoutPage() {
             </div>
             <div className="cart-summary-row">
               <span>Shipping</span>
-              <strong className={freeShipping ? "cart-free-shipping" : ""}>
+              <strong className={hasShippingMethod && medusaShippingTotal === 0 ? "cart-free-shipping" : ""}>
                 {shippingDisplay}
               </strong>
             </div>
-            {!freeShipping && (
+            {hasMedusaItems && !hasShippingMethod && (
               <div className="cart-shipping-hint">
-                Add AED {FREE_SHIPPING_THRESHOLD - subtotal} more for free shipping
+                Shipping is set by your Medusa shipping option after checkout starts.
               </div>
             )}
             <div className="cart-summary-divider" />

@@ -3,11 +3,23 @@
 import { FormEvent, useMemo, useState } from "react";
 import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { formatMoney } from "@/lib/medusa";
 
 type Props = {
   cartId: string;
   stripePublishableKey: string;
 };
+
+type Receipt = {
+  id: string;
+  displayId?: number;
+  email?: string;
+  currencyCode: string;
+  subtotal: number;
+  shippingTotal: number;
+  total: number;
+};
+
 const cardElementOptions = {
   style: {
     base: {
@@ -30,6 +42,7 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [clientSecret, setClientSecret] = useState("");
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [formValues, setFormValues] = useState({
     firstName: "",
     lastName: "",
@@ -91,8 +104,35 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
     return (
       <div className="checkout-success">
         <div className="cw-done-icon">🎉</div>
-        <h2>Order Placed!</h2>
-        <p>Thank you for your order. We&apos;ll send you a confirmation email with tracking details.</p>
+        <h2>Payment Received</h2>
+        <p>Thank you. Your order has been paid successfully and the receipt is below.</p>
+        {receipt && (
+          <div className="checkout-receipt">
+            <div className="checkout-receipt-row">
+              <span>Order</span>
+              <strong>#{receipt.displayId || receipt.id}</strong>
+            </div>
+            {receipt.email && (
+              <div className="checkout-receipt-row">
+                <span>Email</span>
+                <strong>{receipt.email}</strong>
+              </div>
+            )}
+            <div className="checkout-receipt-row">
+              <span>Subtotal</span>
+              <strong>{formatMoney(receipt.subtotal, receipt.currencyCode)}</strong>
+            </div>
+            <div className="checkout-receipt-row">
+              <span>Shipping</span>
+              <strong>{formatMoney(receipt.shippingTotal, receipt.currencyCode)}</strong>
+            </div>
+            <div className="cart-summary-divider" />
+            <div className="checkout-receipt-row checkout-receipt-total">
+              <span>Total Paid</span>
+              <strong>{formatMoney(receipt.total, receipt.currencyCode)}</strong>
+            </div>
+          </div>
+        )}
         <a href="/" className="btn-main">Back to Home</a>
       </div>
     );
@@ -229,6 +269,7 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
                   confirming={confirming}
                   setConfirming={setConfirming}
                   setError={setError}
+                  setReceipt={setReceipt}
                   onSuccess={() => setSuccess(true)}
                 />
               </Elements>
@@ -262,6 +303,7 @@ type StripeCardFieldsProps = {
   confirming: boolean;
   setConfirming: (value: boolean) => void;
   setError: (value: string) => void;
+  setReceipt: (receipt: Receipt | null) => void;
   onSuccess: () => void;
 };
 
@@ -276,6 +318,7 @@ function StripeCardFields({
   confirming,
   setConfirming,
   setError,
+  setReceipt,
   onSuccess,
 }: StripeCardFieldsProps) {
   const stripe = useStripe();
@@ -334,6 +377,7 @@ function StripeCardFields({
         throw new Error(data.error || "Order completion failed");
       }
 
+      setReceipt(data.order ?? null);
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to process payment");

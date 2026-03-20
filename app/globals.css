@@ -1244,6 +1244,31 @@ footer {
   line-height: 1.7;
   margin-bottom: 28px;
 }
+.checkout-receipt {
+  margin: 0 auto 28px;
+  max-width: 360px;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--off-white);
+  padding: 20px;
+}
+.checkout-receipt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.checkout-receipt-row strong {
+  text-align: right;
+}
+.checkout-receipt-total {
+  margin-bottom: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
 
 /* ============================================================
    CUSTOMIZE WIZARD
