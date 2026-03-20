@@ -7,12 +7,6 @@ type Props = {
   params: Promise<{ product: string }>;
 };
 
-const fallbackInfo: Record<string, { title: string; icon: string; price: string; type: string }> = {
-  "custom-mug": { title: "Custom Mug", icon: "☕", price: "AED 60", type: "pc-mug" },
-  "custom-tshirt": { title: "Custom T-Shirt", icon: "👕", price: "AED 89", type: "pc-shirt" },
-  "custom-hoodie": { title: "Custom Hoodie", icon: "🧥", price: "AED 120", type: "pc-hoodie" },
-};
-
 const iconMap: Record<string, string> = {
   mug: "☕",
   tshirt: "👕",
@@ -35,12 +29,9 @@ function getIcon(handle: string): string {
 
 export default async function CustomizePage({ params }: Props) {
   const { product: handle } = await params;
-
-  // Try fetching from Medusa first
   const medusaProduct = await getProductByHandle(handle).catch(() => null);
 
   if (medusaProduct) {
-    // Real Medusa product found — pass real variants
     const variants = (medusaProduct.variants ?? []).map((v) => ({
       id: v.id,
       title: v.title,
@@ -67,28 +58,11 @@ export default async function CustomizePage({ params }: Props) {
     );
   }
 
-  // Fallback to hardcoded info if Medusa is unavailable
-  const info = fallbackInfo[handle];
-
-  if (!info) {
-    return (
-      <main className="customize-page">
-        <h1>Product not found</h1>
-        <a href="/" className="solid-button">Back to Home</a>
-      </main>
-    );
-  }
-
   return (
     <main className="customize-page">
-      <CustomizeWizard
-        productHandle={handle}
-        productTitle={info.title}
-        productIcon={info.icon}
-        productPrice={info.price}
-        productType={info.type}
-        variants={[]}
-      />
+      <h1>Product unavailable</h1>
+      <p>This product could not be loaded from Medusa.</p>
+      <a href="/" className="solid-button">Back to Home</a>
     </main>
   );
 }

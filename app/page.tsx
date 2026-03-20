@@ -1,5 +1,6 @@
 import HomepageBehavior from "./components/homepage-behavior";
 import HomepageFaq from "./components/homepage-faq";
+import { formatMoney, listProducts } from "@/lib/medusa";
 
 const sectionIds = ["products", "how", "styles", "reviews", "faq"];
 
@@ -8,7 +9,7 @@ const heroMockups = [
     img: "/legacy/home/aAsset-24sc-300x300.png",
     alt: "Custom pet mug",
     name: "Custom Mug",
-    price: "AED 60",
+    handle: "custom-mug",
     tag: "🎨 Cartoon Style",
     cls: "mockup-card-1",
   },
@@ -16,7 +17,7 @@ const heroMockups = [
     img: "/legacy/styles/tshirt.png",
     alt: "Custom pet t-shirt",
     name: "Custom T-Shirt",
-    price: "AED 89",
+    handle: "custom-tshirt",
     tag: "🔥 Most Popular",
     cls: "mockup-card-2",
   },
@@ -24,7 +25,7 @@ const heroMockups = [
     img: "/legacy/styles/hoodie.png",
     alt: "Custom pet hoodie",
     name: "Custom Hoodie",
-    price: "AED 120",
+    handle: "custom-hoodie",
     tag: "✏️ Pencil Sketch",
     cls: "mockup-card-3",
   },
@@ -37,7 +38,6 @@ const products = [
     title: "Custom Mug",
     desc: "Your pet's cartoon portrait printed on a premium 11oz ceramic mug. Start every morning with your furry best friend.",
     tags: ["Premium Ceramic", "Dishwasher Safe", "11oz"],
-    price: "AED 60",
     img: "/products/mug.jpg",
     type: "pc-mug",
     featured: false,
@@ -48,7 +48,6 @@ const products = [
     title: "Custom T-Shirt",
     desc: "Soft breathable unisex tee with your pet's cartoon printed front and center. Available in multiple sizes and colors.",
     tags: ["100% Cotton", "Unisex Fit", "Multi Colors"],
-    price: "AED 89",
     img: "/products/tshirt.jpg",
     type: "pc-shirt",
     featured: true,
@@ -59,7 +58,6 @@ const products = [
     title: "Custom Hoodie",
     desc: "Cozy premium hoodie with your pet cartoon. The most memorable gift for any pet lover in your life.",
     tags: ["Premium Fleece", "Unisex", "Gift Ready"],
-    price: "AED 120",
     img: "/products/hoodie.jpg",
     type: "pc-hoodie",
     featured: false,
@@ -131,7 +129,29 @@ const faqItems = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const medusaProducts = await listProducts().catch(() => []);
+  const medusaPriceByHandle = new Map(
+    medusaProducts
+      .filter((product) => product.handle)
+      .map((product) => {
+        const firstVariant = product.variants?.[0];
+        const amount = firstVariant?.calculated_price?.calculated_amount;
+        const currencyCode = firstVariant?.calculated_price?.currency_code ?? "aed";
+
+        return [
+          product.handle as string,
+          typeof amount === "number" ? formatMoney(amount, currencyCode) : "Unavailable",
+        ];
+      }),
+  );
+
+  const heroStartPrice =
+    medusaPriceByHandle.get("custom-mug")
+    ?? medusaPriceByHandle.get("custom-tshirt")
+    ?? medusaPriceByHandle.get("custom-hoodie")
+    ?? "Unavailable";
+
   return (
     <main className="home-page">
       <HomepageBehavior sectionIds={sectionIds} />
@@ -174,7 +194,7 @@ export default function HomePage() {
               <span>Cartoon Styles</span>
             </div>
             <div className="hero-stat">
-              <strong>AED 60</strong>
+              <strong>{heroStartPrice}</strong>
               <span>Starting From</span>
             </div>
             <div className="hero-stat">
@@ -197,7 +217,7 @@ export default function HomePage() {
                 </div>
                 <div className="mockup-copy">
                   <p>{card.name}</p>
-                  <strong>{card.price}</strong>
+                  <strong>{medusaPriceByHandle.get(card.handle) ?? "Unavailable"}</strong>
                   <span className="mockup-tag">{card.tag}</span>
                 </div>
               </a>
@@ -238,7 +258,7 @@ export default function HomePage() {
                 </div>
                 <div className="shop-card-footer">
                   <div className="prod-price">
-                    {p.price} <small>/ piece</small>
+                    {(medusaPriceByHandle.get(p.handle) ?? "Unavailable")} <small>/ piece</small>
                   </div>
                   <a href={`/customize/${p.handle}`} className="btn-cust">
                     Customize <span className="arr">→</span>
