@@ -7,10 +7,15 @@ import crypto from "crypto";
 const s3Bucket = process.env.S3_BUCKET_NAME;
 const s3Region = process.env.AWS_REGION;
 const s3PublicUrl = process.env.S3_PUBLIC_URL;
+const s3Endpoint = process.env.S3_ENDPOINT;
 
 const s3Client =
   s3Bucket && s3Region && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
-    ? new S3Client({ region: s3Region })
+    ? new S3Client({
+        region: s3Region,
+        ...(s3Endpoint ? { endpoint: s3Endpoint } : {}),
+        forcePathStyle: false,
+      })
     : null;
 
 export async function POST(req: NextRequest) {
