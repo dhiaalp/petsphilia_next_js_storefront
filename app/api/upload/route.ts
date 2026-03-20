@@ -6,7 +6,6 @@ import crypto from "crypto";
 
 const s3Bucket = process.env.S3_BUCKET_NAME;
 const s3Region = process.env.AWS_REGION;
-const s3PublicUrl = process.env.S3_PUBLIC_URL;
 const s3Endpoint = process.env.S3_ENDPOINT;
 
 const s3Client =
@@ -48,11 +47,9 @@ export async function POST(req: NextRequest) {
         }),
       );
 
-      const publicBaseUrl =
-        s3PublicUrl || `https://${s3Bucket}.s3.${s3Region}.amazonaws.com`;
-
       return NextResponse.json({
-        url: `${publicBaseUrl.replace(/\/$/, "")}/${key}`,
+        url: `/api/files/${key}`,
+        storageKey: key,
       });
     }
 
@@ -60,7 +57,7 @@ export async function POST(req: NextRequest) {
     await mkdir(uploadsDir, { recursive: true });
     await writeFile(path.join(uploadsDir, filename), buffer);
 
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    return NextResponse.json({ url: `/uploads/${filename}`, storageKey: `uploads/${filename}` });
   } catch (err) {
     console.error("Upload error:", err);
     return NextResponse.json(
