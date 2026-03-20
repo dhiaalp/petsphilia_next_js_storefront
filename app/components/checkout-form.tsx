@@ -6,9 +6,8 @@ import { loadStripe } from "@stripe/stripe-js";
 
 type Props = {
   cartId: string;
+  stripePublishableKey: string;
 };
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
 const cardElementOptions = {
   style: {
     base: {
@@ -25,7 +24,7 @@ const cardElementOptions = {
   },
 };
 
-export default function CheckoutForm({ cartId }: Props) {
+export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
   const [initializing, setInitializing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,7 +39,11 @@ export default function CheckoutForm({ cartId }: Props) {
     city: "",
   });
 
-  const stripeConfigured = Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  const stripeConfigured = Boolean(stripePublishableKey);
+  const stripePromise = useMemo(
+    () => (stripePublishableKey ? loadStripe(stripePublishableKey) : null),
+    [stripePublishableKey],
+  );
   const customerName = useMemo(
     () => `${formValues.firstName} ${formValues.lastName}`.trim(),
     [formValues.firstName, formValues.lastName],

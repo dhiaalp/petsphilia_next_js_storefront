@@ -9,6 +9,7 @@ import CheckoutForm from "@/app/components/checkout-form";
 type CartItem = any;
 
 export default async function CheckoutPage() {
+  const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
   const data = await getOrCreateCart().catch(() => null);
   const cart = data?.cart;
   const localItems = await getLocalCart();
@@ -88,7 +89,10 @@ export default async function CheckoutPage() {
         </div>
 
         <div className="checkout-layout">
-          <CheckoutForm cartId={cart?.id ?? ""} />
+          <CheckoutForm
+            cartId={cart?.id ?? ""}
+            stripePublishableKey={stripePublishableKey}
+          />
 
           <aside className="checkout-summary">
             <h2>Order Summary</h2>
