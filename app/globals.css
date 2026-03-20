@@ -1163,6 +1163,18 @@ footer {
   padding: 16px 14px;
   transition: border-color 0.2s, background 0.2s;
 }
+.checkout-wallet-box {
+  margin-bottom: 16px;
+}
+.checkout-wallet-divider {
+  margin: 8px 0 14px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
 .checkout-card-input:focus-within {
   border-color: var(--orange);
   background: #fff;

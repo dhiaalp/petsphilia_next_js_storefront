@@ -1,7 +1,13 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { CardElement, Elements, useElements, useStripe } from "@stripe/react-stripe-js";
+import {
+  CardElement,
+  Elements,
+  ExpressCheckoutElement,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { formatMoney } from "@/lib/medusa";
 
@@ -257,7 +263,7 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
           <div className="checkout-field">
             <label>Card Details</label>
             <div className="checkout-card-input">
-              <Elements stripe={stripePromise}>
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <StripeCardFields
                   cartId={cartId}
                   clientSecret={clientSecret}
@@ -323,6 +329,64 @@ function StripeCardFields({
 }: StripeCardFieldsProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const [walletAvailable, setWalletAvailable] = useState(false);
+
+  const completeOrder = async () => {
+    const res = await fetch("/api/checkout/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cartId }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Order completion failed");
+    }
+
+    setReceipt(data.order ?? null);
+    onSuccess();
+  };
+
+  const handleWalletConfirm = async (event: {
+    paymentFailed: (payload?: { reason?: "fail"; message?: string }) => void;
+  }) => {
+    if (!stripe || !elements) {
+      setError("Stripe has not loaded yet. Please wait a moment and try again.");
+      event.paymentFailed({ reason: "fail", message: "Stripe is still loading." });
+      return;
+    }
+
+    setConfirming(true);
+    setError("");
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          receipt_email: email,
+        },
+        redirect: "if_required",
+      });
+
+      if (error) {
+        throw new Error(error.message || "Wallet payment confirmation failed");
+      }
+
+      if (paymentIntent?.status !== "succeeded") {
+        throw new Error("Payment was not completed. Please try again.");
+      }
+
+      await completeOrder();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to process Apple Pay";
+      event.paymentFailed({ reason: "fail", message });
+      setError(message);
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   const handleConfirm = async () => {
     if (!stripe || !elements) {
@@ -365,20 +429,7 @@ function StripeCardFields({
         throw new Error("Payment was not completed. Please try again.");
       }
 
-      const res = await fetch("/api/checkout/complete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartId }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Order completion failed");
-      }
-
-      setReceipt(data.order ?? null);
-      onSuccess();
+      await completeOrder();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to process payment");
     } finally {
@@ -388,6 +439,22 @@ function StripeCardFields({
 
   return (
     <>
+      <div className="checkout-wallet-box">
+        <ExpressCheckoutElement
+          options={{
+            buttonHeight: 48,
+            emailRequired: true,
+            phoneNumberRequired: true,
+            paymentMethods: {
+              applePay: "always",
+              googlePay: "auto",
+            },
+          }}
+          onReady={(event) => setWalletAvailable(Boolean(event.availablePaymentMethods))}
+          onConfirm={handleWalletConfirm}
+        />
+      </div>
+      {walletAvailable && <div className="checkout-wallet-divider">or pay by card</div>}
       <CardElement options={cardElementOptions} />
       <button
         type="button"
