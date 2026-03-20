@@ -2,6 +2,8 @@ import HomepageBehavior from "./components/homepage-behavior";
 import HomepageFaq from "./components/homepage-faq";
 import { formatMoney, listProducts } from "@/lib/medusa";
 
+export const dynamic = "force-dynamic";
+
 const sectionIds = ["products", "how", "styles", "reviews", "faq"];
 
 const heroMockups = [
