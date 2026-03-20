@@ -13,10 +13,6 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "petsphilia.store",
-      },
-      {
         protocol: "http",
         hostname: "localhost",
       },

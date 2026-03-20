@@ -82,7 +82,7 @@ export default function HomepageBehavior({ sectionIds }: Props) {
         <Link href="/" className="home-logo">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://petsphilia.store/wp-content/uploads/2025/04/cropped-logoAsset-5sc-197x53.png"
+            src="/legacy/home/cropped-logoAsset-5sc-197x53.png"
             alt="Petsphilia"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";

@@ -5,7 +5,7 @@ const sectionIds = ["products", "how", "styles", "reviews", "faq"];
 
 const heroMockups = [
   {
-    img: "https://petsphilia.store/wp-content/uploads/2025/04/aAsset-24sc-300x300.png",
+    img: "/legacy/home/aAsset-24sc-300x300.png",
     alt: "Custom pet mug",
     name: "Custom Mug",
     price: "AED 60",
@@ -13,7 +13,7 @@ const heroMockups = [
     cls: "mockup-card-1",
   },
   {
-    img: "https://petsphilia.store/wp-content/plugins/pet-cartoonizer/img/tshirt.png",
+    img: "/legacy/styles/tshirt.png",
     alt: "Custom pet t-shirt",
     name: "Custom T-Shirt",
     price: "AED 89",
@@ -21,7 +21,7 @@ const heroMockups = [
     cls: "mockup-card-2",
   },
   {
-    img: "https://petsphilia.store/wp-content/plugins/pet-cartoonizer/img/hoodie.png",
+    img: "/legacy/styles/hoodie.png",
     alt: "Custom pet hoodie",
     name: "Custom Hoodie",
     price: "AED 120",
@@ -75,9 +75,9 @@ const styleCards = [
 ];
 
 const reviewPhotos = [
-  { src: "https://petsphilia.store/wp-content/uploads/2025/04/sAsset-10sc.webp", fallback: "🐶" },
-  { src: "https://petsphilia.store/wp-content/uploads/2025/04/sAsset-11sc.webp", fallback: "🐱" },
-  { src: "https://petsphilia.store/wp-content/uploads/2025/04/sAsset-12sc.webp", fallback: "🐾" },
+  { src: "/legacy/home/sAsset-10sc.webp", fallback: "🐶" },
+  { src: "/legacy/home/sAsset-11sc.webp", fallback: "🐱" },
+  { src: "/legacy/home/sAsset-12sc.webp", fallback: "🐾" },
 ];
 
 const reviews = [
@@ -254,7 +254,7 @@ export default function HomePage() {
       <section className="home-band" id="how">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://petsphilia.store/wp-content/uploads/2025/04/cropped-logoAsset-5sc-197x53.png"
+          src="/legacy/home/cropped-logoAsset-5sc-197x53.png"
           alt="Petsphilia"
           className="how-logo"
         />
@@ -294,7 +294,7 @@ export default function HomePage() {
               <div className="style-tile-icon">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`https://petsphilia.store/wp-content/plugins/pet-cartoonizer/img/${style.img}`}
+                  src={`/legacy/styles/${style.img}`}
                   alt={style.name}
                 />
               </div>
@@ -366,7 +366,7 @@ export default function HomePage() {
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://petsphilia.store/wp-content/uploads/2025/04/cropped-logoAsset-5sc-197x53.png"
+              src="/legacy/home/cropped-logoAsset-5sc-197x53.png"
               alt="Petsphilia"
               className="ft-logo"
             />

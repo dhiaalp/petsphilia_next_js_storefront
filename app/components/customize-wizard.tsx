@@ -380,7 +380,7 @@ export default function CustomizeWizard({
                 <div className="cw-style-img">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={`https://petsphilia.store/wp-content/plugins/pet-cartoonizer/img/${style.img}`}
+                    src={`/legacy/styles/${style.img}`}
                     alt={style.name}
                   />
                 </div>
