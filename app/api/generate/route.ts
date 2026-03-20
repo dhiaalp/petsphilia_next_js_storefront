@@ -9,6 +9,15 @@ const MOCKUP_TEXT: Record<string, string> = {
   mug: "a WHITE MUG",
 };
 
+const PRINT_AREA_TEXT: Record<string, string> = {
+  tshirt:
+    "Place the artwork as a medium-size front chest print, centered horizontally, taking up about 30% to 40% of the shirt width with generous white space around it.",
+  hoodie:
+    "Place the artwork as a medium-size front chest print, centered horizontally, taking up about 28% to 38% of the hoodie width with generous white space around it.",
+  mug:
+    "Place the artwork as a medium-size print on the center of the mug body, taking up about 35% to 45% of the visible mug area and leaving clear empty margins around it.",
+};
+
 async function callGemini(apiKey: string, parts: Record<string, unknown>[]) {
   const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
     method: "POST",
@@ -84,6 +93,8 @@ export async function POST(req: NextRequest) {
       + `${textInstruction} `
       + `The background MUST be completely WHITE - clean, minimal, with no objects, no shadows, no textures. `
       + `The design should be centered and suitable for printing on products. `
+      + `Keep the illustration compact with comfortable white margins on all sides, as if it will later be placed inside a print area. `
+      + `Do not let the artwork fill the entire frame or touch the edges. `
       + `This is just the design artwork - NOT on any product yet. Pure white background only.`;
 
     const artworkResult = await callGemini(apiKey, [
@@ -113,6 +124,7 @@ export async function POST(req: NextRequest) {
       else if (product.includes("hoodie")) productType = "hoodie";
 
       const mockupText = MOCKUP_TEXT[productType] || MOCKUP_TEXT.mug;
+      const printAreaText = PRINT_AREA_TEXT[productType] || PRINT_AREA_TEXT.mug;
       const mockupTextInstruction = petName
         ? `Add the name "${petName}" elegantly on the product if it fits naturally.`
         : "";
@@ -122,6 +134,10 @@ export async function POST(req: NextRequest) {
         + `Keep the pet design EXACTLY as shown in the reference image - same colors, same style, same composition, same details. `
         + `Do NOT change the design colors to white - keep the original design colors. `
         + `The product itself (tshirt/hoodie/mug/etc) should be WHITE. `
+        + `${printAreaText} `
+        + `The artwork must look neatly fitted inside the printable area, smaller than the product, and never oversized. `
+        + `Leave visible blank product space around the design so the mockup feels realistic and premium. `
+        + `Do not crop the design, do not wrap it around edges, and do not let it dominate the whole product surface. `
         + `${mockupTextInstruction} `
         + `The overall image should look like a professional product shot - realistic, well-lit, and ready for an online store. `
         + `The white product must be clearly visible with the original design, set against the orange gradient background.`;
