@@ -67,6 +67,12 @@ export default async function CartPage() {
                           {petNameMeta && <span className="cart-custom-tag">🐾 {petNameMeta}</span>}
                         </div>
                       )}
+                      <form action="/api/cart/remove" method="POST" className="cart-item-remove-form">
+                        <input type="hidden" name="lineItemId" value={item.id} />
+                        <button type="submit" className="cart-item-remove">
+                          Remove
+                        </button>
+                      </form>
                     </div>
                     <strong className="cart-item-price">
                       {formatMoney(item.unit_price, cart.currency_code)}
@@ -91,6 +97,12 @@ export default async function CartPage() {
                       {item.artStyle && <span className="cart-custom-tag">🎨 {item.artStyle}</span>}
                       {item.petName && <span className="cart-custom-tag">🐾 {item.petName}</span>}
                     </div>
+                    <form action="/api/cart/remove" method="POST" className="cart-item-remove-form">
+                      <input type="hidden" name="localItemId" value={item.id} />
+                      <button type="submit" className="cart-item-remove">
+                        Remove
+                      </button>
+                    </form>
                   </div>
                   <strong className="cart-item-price">{item.price}</strong>
                 </article>

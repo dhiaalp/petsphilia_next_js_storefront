@@ -968,6 +968,21 @@ footer {
   gap: 6px;
   margin-top: 10px;
 }
+.cart-item-remove-form {
+  margin-top: 12px;
+}
+.cart-item-remove {
+  border: 0;
+  background: transparent;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+}
+.cart-item-remove:hover {
+  text-decoration: underline;
+}
 .cart-custom-tag {
   display: inline-flex;
   align-items: center;
