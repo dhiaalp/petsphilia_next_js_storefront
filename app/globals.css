@@ -537,6 +537,32 @@ img { object-fit: cover; }
   font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 8px;
 }
 .step-desc { font-size: 12.5px; color: rgba(255, 255, 255, 0.68); line-height: 1.7; }
+.how-video {
+  max-width: 980px;
+  margin: 44px auto 0;
+  position: relative;
+  z-index: 1;
+}
+.how-video-frame {
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08)),
+    rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.how-video-frame iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 20px;
+  background: #000;
+}
 
 /* ============================================================
    ART STYLES
@@ -1974,6 +2000,7 @@ footer {
   .rev-photos { gap: 10px; }
   .rev-photo { width: 160px; }
   .home-band { padding: 60px 24px; }
+  .how-video { margin-top: 36px; }
   .home-reviews { padding: 60px 24px; }
   .closing-cta { padding: 70px 24px; }
   .ft-top { grid-template-columns: 1fr 1fr; gap: 28px; }
@@ -1998,6 +2025,11 @@ footer {
   .hero-actions-row { flex-direction: column; align-items: flex-start; }
   .styles-grid { grid-template-columns: repeat(2, 1fr); }
   .steps-grid { grid-template-columns: 1fr; }
+  .how-video-frame {
+    border-radius: 22px;
+    padding: 8px;
+  }
+  .how-video-frame iframe { border-radius: 16px; }
   .ft-top { grid-template-columns: 1fr; }
   .ft-bot { flex-direction: column; align-items: flex-start; }
   /* Checkout small */

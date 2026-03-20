@@ -277,6 +277,19 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+
+        <div className="how-video reveal">
+          <div className="how-video-frame">
+            <iframe
+              src="https://www.youtube.com/embed/kwgvQ9Qxodg?autoplay=1&mute=1&loop=1&playlist=kwgvQ9Qxodg&controls=1&rel=0"
+              title="How it works video"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </div>
       </section>
 
       {/* ── ART STYLES ── */}
