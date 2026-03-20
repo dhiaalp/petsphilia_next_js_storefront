@@ -1156,6 +1156,17 @@ footer {
   color: var(--muted);
   margin: 0;
 }
+.checkout-card-input {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--off-white);
+  padding: 16px 14px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.checkout-card-input:focus-within {
+  border-color: var(--orange);
+  background: #fff;
+}
 
 /* Checkout order summary sidebar */
 .checkout-summary {
