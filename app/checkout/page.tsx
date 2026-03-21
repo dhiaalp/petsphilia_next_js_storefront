@@ -8,6 +8,24 @@ import CheckoutForm from "@/app/components/checkout-form";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type CartItem = any;
 
+const productCardMeta: Record<string, { title: string; subtitle: string; thumbnail: string }> = {
+  "custom-mug": {
+    title: "Custom Mug",
+    subtitle: "Premium ceramic mug printed with your pet artwork.",
+    thumbnail: "/products/mug.jpg",
+  },
+  "custom-tshirt": {
+    title: "Custom T-Shirt",
+    subtitle: "Soft breathable tee with your pet artwork front and center.",
+    thumbnail: "/products/tshirt.jpg",
+  },
+  "custom-hoodie": {
+    title: "Custom Hoodie",
+    subtitle: "Cozy fleece hoodie made personal with your pet design.",
+    thumbnail: "/products/hoodie.jpg",
+  },
+};
+
 export default async function CheckoutPage() {
   const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
   const data = await getOrCreateCart().catch(() => null);
@@ -97,16 +115,18 @@ export default async function CheckoutPage() {
       const firstVariant = product.variants?.[0];
       const amount = firstVariant?.calculated_price?.calculated_amount;
       const code = firstVariant?.calculated_price?.currency_code ?? currencyCode;
+      const meta = productCardMeta[product.handle ?? ""] ?? null;
 
       return {
         id: product.id,
-        title: product.title,
+        title: meta?.title ?? product.title,
         handle: product.handle!,
-        subtitle: product.subtitle ?? product.description ?? "Personalized pet gift",
-        thumbnail: product.thumbnail,
-        price: typeof amount === "number" ? formatMoney(amount, code) : "Unavailable",
+        subtitle: meta?.subtitle ?? product.subtitle ?? product.description ?? "Personalized pet gift",
+        thumbnail: meta?.thumbnail ?? product.thumbnail,
+        price: typeof amount === "number" ? formatMoney(amount, code) : null,
       };
-    });
+    })
+    .filter((product) => Boolean(product.price));
 
   return (
     <main className="checkout-page">
