@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 import { getOrCreateCart, getLocalCart } from "@/lib/cart";
-import { formatMoney } from "@/lib/medusa";
+import { formatMoney, listProducts } from "@/lib/medusa";
 import CheckoutForm from "@/app/components/checkout-form";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -13,10 +13,12 @@ export default async function CheckoutPage() {
   const data = await getOrCreateCart().catch(() => null);
   const cart = data?.cart;
   const localItems = await getLocalCart();
+  const medusaProducts = await listProducts(6).catch(() => []);
 
   const hasMedusaItems = !!cart?.items?.length;
   const hasLocalItems = localItems.length > 0;
   const hasAnyItems = hasMedusaItems || hasLocalItems;
+  const purchasedHandles = new Set<string>();
 
   if (!hasAnyItems) {
     return (
@@ -43,6 +45,10 @@ export default async function CheckoutPage() {
   if (hasMedusaItems) {
     for (const item of cart.items! as CartItem[]) {
       const meta = (item.metadata ?? {}) as Record<string, string>;
+      const itemHandle = item.product_handle ?? item.product?.handle ?? "";
+      if (itemHandle) {
+        purchasedHandles.add(itemHandle);
+      }
       orderItems.push({
         title: item.title,
         variant: item.variant?.title ?? "",
@@ -53,6 +59,9 @@ export default async function CheckoutPage() {
     }
   } else {
     for (const item of localItems) {
+      if (item.productHandle) {
+        purchasedHandles.add(item.productHandle);
+      }
       orderItems.push({
         title: item.productTitle,
         variant: item.size ? `Size: ${item.size}` : "",
@@ -81,6 +90,23 @@ export default async function CheckoutPage() {
       ? formatMoney(medusaTotal, currencyCode)
       : formatMoney(medusaSubtotal, currencyCode)
     : `AED ${subtotal}`;
+  const recommendedProducts = medusaProducts
+    .filter((product) => product.handle && !purchasedHandles.has(product.handle))
+    .slice(0, 3)
+    .map((product) => {
+      const firstVariant = product.variants?.[0];
+      const amount = firstVariant?.calculated_price?.calculated_amount;
+      const code = firstVariant?.calculated_price?.currency_code ?? currencyCode;
+
+      return {
+        id: product.id,
+        title: product.title,
+        handle: product.handle!,
+        subtitle: product.subtitle ?? product.description ?? "Personalized pet gift",
+        thumbnail: product.thumbnail,
+        price: typeof amount === "number" ? formatMoney(amount, code) : "Unavailable",
+      };
+    });
 
   return (
     <main className="checkout-page">
@@ -99,6 +125,7 @@ export default async function CheckoutPage() {
           <CheckoutForm
             cartId={cart?.id ?? ""}
             stripePublishableKey={stripePublishableKey}
+            recommendedProducts={recommendedProducts}
           />
 
           <aside className="checkout-summary">

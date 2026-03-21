@@ -14,6 +14,14 @@ import { formatMoney } from "@/lib/medusa";
 type Props = {
   cartId: string;
   stripePublishableKey: string;
+  recommendedProducts: Array<{
+    id: string;
+    title: string;
+    handle: string;
+    subtitle: string;
+    thumbnail?: string | null;
+    price: string;
+  }>;
 };
 
 type Receipt = {
@@ -46,7 +54,7 @@ const cardElementOptions = {
   },
 };
 
-export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
+export default function CheckoutForm({ cartId, stripePublishableKey, recommendedProducts }: Props) {
   const [initializing, setInitializing] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -113,9 +121,17 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
   if (success) {
     return (
       <div className="checkout-success">
-        <div className="cw-done-icon">🎉</div>
-        <h2>Payment Received</h2>
-        <p>Thank you. Your order has been paid successfully and the receipt is below.</p>
+        <div className="checkout-success-banner">
+          <div className="cw-done-icon">🎉</div>
+          <div>
+            <span className="checkout-success-kicker">Thank You</span>
+            <h2>Your order is confirmed</h2>
+            <p>
+              We received your payment successfully. Your personalized order is now in progress and
+              your receipt is below.
+            </p>
+          </div>
+        </div>
         {receipt && (
           <div className="checkout-receipt">
             <div className="checkout-receipt-row">
@@ -143,7 +159,43 @@ export default function CheckoutForm({ cartId, stripePublishableKey }: Props) {
             </div>
           </div>
         )}
-        <a href="/" className="btn-main">Back to Home</a>
+        {recommendedProducts.length > 0 && (
+          <section className="checkout-recommendations">
+            <div className="checkout-recommendations-head">
+              <span className="section-kicker">You May Also Like</span>
+              <h3>Complete the set with another pet gift</h3>
+              <p>These products are live from your Medusa catalog and ready to customize.</p>
+            </div>
+            <div className="checkout-recommendations-grid">
+              {recommendedProducts.map((product) => (
+                <article key={product.id} className="checkout-rec-card">
+                  <div className="checkout-rec-media">
+                    {product.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={product.thumbnail} alt={product.title} />
+                    ) : (
+                      <div className="checkout-rec-placeholder">🐾</div>
+                    )}
+                  </div>
+                  <div className="checkout-rec-copy">
+                    <strong>{product.title}</strong>
+                    <p>{product.subtitle}</p>
+                    <div className="checkout-rec-footer">
+                      <span>{product.price}</span>
+                      <a href={`/customize/${product.handle}`} className="btn-cust">
+                        Customize <span className="arr">→</span>
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+        <div className="checkout-success-actions">
+          <a href="/" className="btn-main">Back to Home</a>
+          <a href="/#products" className="hero-secondary-link">Shop More</a>
+        </div>
       </div>
     );
   }
