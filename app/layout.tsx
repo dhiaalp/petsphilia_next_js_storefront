@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito, Inter } from "next/font/google";
 import "./globals.css";
+import MetaPixel from "./components/meta-pixel";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -26,9 +27,14 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const metaPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID ?? "";
+
   return (
     <html lang="en">
-      <body className={`${nunito.variable} ${inter.variable}`}>{children}</body>
+      <body className={`${nunito.variable} ${inter.variable}`}>
+        {metaPixelId && <MetaPixel pixelId={metaPixelId} />}
+        {children}
+      </body>
     </html>
   );
 }
