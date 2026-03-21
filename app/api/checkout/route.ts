@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendMetaEvent } from "@/lib/meta-conversions";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "";
@@ -171,6 +172,31 @@ export async function POST(req: NextRequest) {
     if (!clientSecret) {
       throw new Error("Stripe client secret was not returned");
     }
+
+    await sendMetaEvent({
+      eventName: "InitiateCheckout",
+      req,
+      eventSourceUrl: new URL("/checkout", req.url).toString(),
+      email,
+      phone,
+      firstName,
+      lastName,
+      city,
+      country: country || "ae",
+      value:
+        typeof refreshedCart.cart?.total === "number"
+          ? refreshedCart.cart.total
+          : undefined,
+      currency: refreshedCart.cart?.currency_code ?? "aed",
+      contentIds: cartItems
+        .map((item: Record<string, unknown>) => {
+          const meta = (item.metadata ?? {}) as Record<string, string>;
+          return meta.product_handle || String(item.variant_id ?? "");
+        })
+        .filter(Boolean),
+      numItems: cartItems.length,
+      eventId: `checkout_${cartId}`,
+    });
 
     return NextResponse.json({ success: true, clientSecret });
   } catch (err) {

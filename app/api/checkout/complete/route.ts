@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { sendMetaEvent } from "@/lib/meta-conversions";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000";
 const PK = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "";
@@ -47,6 +48,28 @@ export async function POST(req: NextRequest) {
 
     const cookieStore = await cookies();
     cookieStore.delete("_petsphilia_cart_id");
+
+    await sendMetaEvent({
+      eventName: "Purchase",
+      req,
+      eventSourceUrl: new URL("/checkout", req.url).toString(),
+      email: completeRes.order?.email,
+      phone: completeRes.order?.shipping_address?.phone,
+      firstName: completeRes.order?.shipping_address?.first_name,
+      lastName: completeRes.order?.shipping_address?.last_name,
+      city: completeRes.order?.shipping_address?.city,
+      country: completeRes.order?.shipping_address?.country_code,
+      value:
+        typeof completeRes.order?.total === "number"
+          ? completeRes.order.total
+          : undefined,
+      currency: completeRes.order?.currency_code ?? "aed",
+      contentIds:
+        completeRes.order?.items?.map((item: { variant_id?: string }) => item.variant_id || "").filter(Boolean) ??
+        [],
+      numItems: completeRes.order?.items?.length,
+      eventId: `purchase_${completeRes.order?.id ?? cartId}`,
+    });
 
     return NextResponse.json({
       success: true,

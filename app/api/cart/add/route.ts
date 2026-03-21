@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendMetaEvent } from "@/lib/meta-conversions";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await medusa.store.cart.createLineItem(cartId, {
+    const created = await medusa.store.cart.createLineItem(cartId, {
       variant_id: variantId,
       quantity: 1,
       metadata: {
@@ -46,6 +47,24 @@ export async function POST(req: NextRequest) {
         product_handle: productHandle,
         ...(size && { size }),
       },
+    });
+
+    const createdItem =
+      created.cart?.items?.find((item) => item.variant_id === variantId) ??
+      created.cart?.items?.[created.cart.items.length - 1];
+
+    await sendMetaEvent({
+      eventName: "AddToCart",
+      req,
+      eventSourceUrl: new URL("/cart", req.url).toString(),
+      contentName: productHandle || createdItem?.title || "Custom product",
+      contentIds: productHandle ? [productHandle] : variantId ? [variantId] : [],
+      currency: created.cart?.currency_code ?? "aed",
+      value:
+        typeof createdItem?.unit_price === "number"
+          ? createdItem.unit_price
+          : undefined,
+      numItems: 1,
     });
 
     return NextResponse.json({ success: true, source: "medusa" });
