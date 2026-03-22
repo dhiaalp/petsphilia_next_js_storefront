@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendGAEvent } from "@/lib/google-analytics-events";
 import { sendMetaEvent } from "@/lib/meta-conversions";
 
 export async function POST(req: NextRequest) {
@@ -65,6 +66,28 @@ export async function POST(req: NextRequest) {
           ? createdItem.unit_price
           : undefined,
       numItems: 1,
+    });
+
+    await sendGAEvent({
+      req,
+      name: "add_to_cart",
+      currency: created.cart?.currency_code ?? "aed",
+      value:
+        typeof createdItem?.unit_price === "number"
+          ? createdItem.unit_price
+          : undefined,
+      items: [
+        {
+          item_id: productHandle || variantId,
+          item_name: createdItem?.title || productHandle || "Custom product",
+          item_variant: size || artStyle || undefined,
+          price:
+            typeof createdItem?.unit_price === "number"
+              ? createdItem.unit_price
+              : undefined,
+          quantity: 1,
+        },
+      ],
     });
 
     return NextResponse.json({ success: true, source: "medusa" });

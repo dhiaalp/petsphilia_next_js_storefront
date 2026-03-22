@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sendGAEvent } from "@/lib/google-analytics-events";
 import { sendMetaEvent } from "@/lib/meta-conversions";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000";
@@ -196,6 +197,26 @@ export async function POST(req: NextRequest) {
         .filter(Boolean),
       numItems: cartItems.length,
       eventId: `checkout_${cartId}`,
+    });
+
+    await sendGAEvent({
+      req,
+      name: "begin_checkout",
+      currency: refreshedCart.cart?.currency_code ?? "aed",
+      value:
+        typeof refreshedCart.cart?.total === "number"
+          ? refreshedCart.cart.total
+          : undefined,
+      items: cartItems.map((item: Record<string, unknown>) => {
+        const meta = (item.metadata ?? {}) as Record<string, string>;
+        return {
+          item_id: meta.product_handle || String(item.variant_id ?? ""),
+          item_name: String(item.title ?? "Custom product"),
+          item_variant: (item.variant as Record<string, string>)?.title,
+          price: typeof item.unit_price === "number" ? item.unit_price : undefined,
+          quantity: typeof item.quantity === "number" ? item.quantity : 1,
+        };
+      }),
     });
 
     return NextResponse.json({ success: true, clientSecret });

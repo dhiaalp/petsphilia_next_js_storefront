@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { sendGAEvent } from "@/lib/google-analytics-events";
 import { sendMetaEvent } from "@/lib/meta-conversions";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000";
@@ -69,6 +70,34 @@ export async function POST(req: NextRequest) {
         [],
       numItems: completeRes.order?.items?.length,
       eventId: `purchase_${completeRes.order?.id ?? cartId}`,
+    });
+
+    await sendGAEvent({
+      req,
+      name: "purchase",
+      userId: completeRes.order?.customer_id,
+      transactionId: completeRes.order?.id,
+      currency: completeRes.order?.currency_code ?? "aed",
+      value:
+        typeof completeRes.order?.total === "number"
+          ? completeRes.order.total
+          : undefined,
+      items:
+        completeRes.order?.items?.map(
+          (item: {
+            variant_id?: string;
+            title?: string;
+            variant_title?: string;
+            unit_price?: number;
+            quantity?: number;
+          }) => ({
+            item_id: item.variant_id || "",
+            item_name: item.title || "Custom product",
+            item_variant: item.variant_title,
+            price: item.unit_price,
+            quantity: item.quantity,
+          }),
+        ) ?? [],
     });
 
     return NextResponse.json({
