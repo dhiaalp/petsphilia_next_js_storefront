@@ -409,7 +409,7 @@ export default async function HomePage() {
               Celebrate your pet with one-of-a-kind cartoon artwork, printed on products
               you&apos;ll actually use and love. Based in Dubai, shipping across the UAE.
             </p>
-            <a href="https://wa.me/971000000000" className="ft-wa">
+            <a href="https://wa.me/971585573621" className="ft-wa">
               💬 Chat on WhatsApp
             </a>
           </div>
@@ -456,7 +456,7 @@ export default async function HomePage() {
       </footer>
 
       {/* ── WHATSAPP BUTTON ── */}
-      <a href="https://wa.me/971000000000" className="wa-btn" title="Chat on WhatsApp">
+      <a href="https://wa.me/971585573621" className="wa-btn" title="Chat on WhatsApp">
         <div className="wa-ring" />
         💬
       </a>
