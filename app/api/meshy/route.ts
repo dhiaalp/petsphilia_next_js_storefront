@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
         sculptureImage: sculptureResult.image,
         sculptureMimeType: sculptureResult.mimeType,
         taskId: null,
-        meshyError: "Failed to start 3D generation. You can retry.",
+        meshyError: `Meshy error (${meshyRes.status}): ${errText.slice(0, 200)}`,
       });
     }
 
