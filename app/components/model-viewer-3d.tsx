@@ -19,10 +19,10 @@ function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
   const clonedScene = useMemo(() => {
     const clone = scene.clone(true);
     const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0.32, 0.34, 0.40),
-      roughness: 0.65,
+      color: new THREE.Color(0.18431, 0.20000, 0.25098),
+      roughness: 0.8,
       metalness: 0.0,
-      clearcoat: 0.15,
+      clearcoat: 0.05,
       clearcoatRoughness: 0.4,
       sheen: 0.05,
       sheenColor: new THREE.Color(0.4, 0.42, 0.5),
