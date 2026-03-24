@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -11,22 +11,25 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-const greyMaterial = new THREE.MeshStandardMaterial({
-  color: new THREE.Color(0.45, 0.45, 0.47),
-  roughness: 0.55,
-  metalness: 0.05,
-});
-
 function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
 
-  // Apply grey resin material to all meshes
-  scene.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh) {
-      (child as THREE.Mesh).material = greyMaterial;
-    }
-  });
+  // Clone scene and apply grey resin material to all meshes
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true);
+    const mat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color(0.42, 0.42, 0.44),
+      roughness: 0.5,
+      metalness: 0.08,
+    });
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        (child as THREE.Mesh).material = mat;
+      }
+    });
+    return clone;
+  }, [scene]);
 
   useFrame((_, delta) => {
     if (autoRotate && ref.current) {
@@ -34,7 +37,7 @@ function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
     }
   });
 
-  return <primitive ref={ref} object={scene} />;
+  return <primitive ref={ref} object={clonedScene} />;
 }
 
 function Loader() {
