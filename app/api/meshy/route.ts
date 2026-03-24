@@ -83,8 +83,9 @@ async function callGemini(apiKey: string, parts: Record<string, unknown>[]) {
 }
 
 /**
- * POST  - Step 1: Generate sculpture image via Gemini, then start Meshy 3D task
- *         OR just start Meshy task if sculptureImageUrl is provided
+ * POST  - Two actions depending on body:
+ *   1. { imageBase64, mimeType } → Generate sculpture via Gemini, return image
+ *   2. { sculptureBase64, sculptureMimeType } → Send to Meshy as data URL, return taskId
  * GET   - Poll Meshy task status
  */
 export async function POST(req: NextRequest) {
@@ -100,14 +101,17 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { imageBase64, mimeType, sculptureImageUrl } = body as {
+    const { imageBase64, mimeType, sculptureBase64, sculptureMimeType } = body as {
       imageBase64?: string;
       mimeType?: string;
-      sculptureImageUrl?: string;
+      sculptureBase64?: string;
+      sculptureMimeType?: string;
     };
 
-    // If sculptureImageUrl is provided, skip Gemini and go straight to Meshy
-    if (sculptureImageUrl) {
+    // Action 2: Send sculpture to Meshy as a data URL
+    if (sculptureBase64 && sculptureMimeType) {
+      const dataUrl = `data:${sculptureMimeType};base64,${sculptureBase64}`;
+
       const meshyRes = await fetch(`${MESHY_API_BASE}/image-to-3d`, {
         method: "POST",
         headers: {
@@ -115,7 +119,7 @@ export async function POST(req: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          image_url: sculptureImageUrl,
+          image_url: dataUrl,
           enable_pbr: true,
           should_remesh: true,
           topology: "quad",
@@ -133,7 +137,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ taskId: meshyData.result });
     }
 
-    // Step 1: Generate sculpture image from pet photo via Gemini
+    // Action 1: Generate sculpture image from pet photo via Gemini
     if (!imageBase64 || !mimeType) {
       return NextResponse.json(
         { error: "Missing required fields: imageBase64 and mimeType" },
@@ -158,7 +162,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Return the sculpture image so the client can upload it and then start the Meshy task
     return NextResponse.json({
       sculptureImage: sculptureResult.image,
       sculptureMimeType: sculptureResult.mimeType,

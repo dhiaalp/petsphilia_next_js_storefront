@@ -125,7 +125,7 @@ export default function KeychainWizard({
     }
   };
 
-  // Step 3 → 4: Upload sculpture image, then start Meshy 3D generation
+  // Step 3 → 4: Send sculpture base64 directly to Meshy via our API
   const handleGenerate3D = async () => {
     if (!sculptureBase64) return;
 
@@ -134,25 +134,11 @@ export default function KeychainWizard({
     setStep("generate-3d");
 
     try {
-      // First upload the sculpture image to get a public URL
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image: sculptureBase64, mimeType: sculptureMime }),
-      });
-      const uploadData = await uploadRes.json();
-      if (!uploadRes.ok) throw new Error("Failed to upload sculpture image");
-
-      // Make the URL absolute for Meshy
-      const sculptureUrl = uploadData.url.startsWith("http")
-        ? uploadData.url
-        : `${window.location.origin}${uploadData.url}`;
-
-      // Start Meshy 3D generation
+      // Send sculpture base64 directly — server forwards to Meshy as data URL
       const meshyRes = await fetch("/api/meshy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sculptureImageUrl: sculptureUrl }),
+        body: JSON.stringify({ sculptureBase64, sculptureMimeType: sculptureMime }),
       });
       const meshyData = await meshyRes.json();
       if (!meshyRes.ok) throw new Error(meshyData.error || "Failed to start 3D generation");
