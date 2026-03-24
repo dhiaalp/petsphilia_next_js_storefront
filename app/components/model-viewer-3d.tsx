@@ -4,10 +4,10 @@ import { Suspense, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   OrbitControls,
-  Stage,
   useGLTF,
   Html,
   Environment,
+  ContactShadows,
 } from "@react-three/drei";
 import * as THREE from "three";
 
@@ -93,16 +93,32 @@ export default function ModelViewer3D({ modelUrl, petName }: Props) {
         <color attach="background" args={["#f0f0f0"]} />
         <fog attach="fog" args={["#f0f0f0", 8, 20]} />
 
+        {/* Key light — strong top-down to cast deep shadows */}
+        <directionalLight
+          castShadow
+          position={[0, 8, 2]}
+          intensity={2.5}
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-bias={-0.001}
+        />
+        {/* Soft fill from front-left */}
+        <directionalLight position={[-3, 3, 4]} intensity={0.6} />
+        {/* Subtle rim light from behind */}
+        <directionalLight position={[2, 2, -3]} intensity={0.3} />
+        {/* Low ambient so shadows stay deep */}
+        <ambientLight intensity={0.15} />
+
         <Suspense fallback={<Loader />}>
-          <Stage
-            intensity={0.6}
-            shadows={{ type: "contact", opacity: 0.4, blur: 2.5 }}
-            adjustCamera={1.5}
-            environment="city"
-          >
-            <Model url={modelUrl} autoRotate={autoRotate} />
-          </Stage>
-          <Environment preset="city" />
+          <Model url={modelUrl} autoRotate={autoRotate} />
+          <ContactShadows
+            position={[0, -0.5, 0]}
+            opacity={0.6}
+            scale={5}
+            blur={2}
+            far={2}
+          />
+          <Environment preset="city" environmentIntensity={0.3} />
         </Suspense>
 
         <OrbitControls
