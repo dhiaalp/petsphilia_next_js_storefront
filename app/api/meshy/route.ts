@@ -143,10 +143,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         image_url: dataUrl,
         ai_model: "meshy-6",
-        enable_pbr: true,
-        should_remesh: true,
-        topology: "quad",
-        target_polycount: 30000,
+        should_texture: false,
+        should_remesh: false,
       }),
     });
 
