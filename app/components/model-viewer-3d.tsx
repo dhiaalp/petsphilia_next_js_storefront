@@ -11,9 +11,22 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
+const greyMaterial = new THREE.MeshStandardMaterial({
+  color: new THREE.Color(0.45, 0.45, 0.47),
+  roughness: 0.55,
+  metalness: 0.05,
+});
+
 function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
+
+  // Apply grey resin material to all meshes
+  scene.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      (child as THREE.Mesh).material = greyMaterial;
+    }
+  });
 
   useFrame((_, delta) => {
     if (autoRotate && ref.current) {
