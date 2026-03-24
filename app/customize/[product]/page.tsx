@@ -1,4 +1,5 @@
 import CustomizeWizard from "@/app/components/customize-wizard";
+import KeychainWizard from "@/app/components/keychain-wizard";
 import { getProductByHandle, formatMoney } from "@/lib/medusa";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +13,13 @@ const iconMap: Record<string, string> = {
   tshirt: "👕",
   shirt: "👕",
   hoodie: "🧥",
+  keychain: "🔑",
 };
 
 function getProductType(handle: string): string {
   if (handle.includes("tshirt") || handle.includes("shirt")) return "pc-shirt";
   if (handle.includes("hoodie")) return "pc-hoodie";
+  if (handle.includes("keychain")) return "pc-keychain";
   return "pc-mug";
 }
 
@@ -44,16 +47,27 @@ export default async function CustomizePage({ params }: Props) {
       ? formatMoney(firstPrice.price, firstPrice.currencyCode)
       : "—";
 
+    const isKeychain = handle.includes("keychain");
+
     return (
       <main className="customize-page">
-        <CustomizeWizard
-          productHandle={handle}
-          productTitle={medusaProduct.title}
-          productIcon={getIcon(handle)}
-          productPrice={priceLabel}
-          productType={getProductType(handle)}
-          variants={variants}
-        />
+        {isKeychain ? (
+          <KeychainWizard
+            productHandle={handle}
+            productTitle={medusaProduct.title}
+            productPrice={priceLabel}
+            variants={variants}
+          />
+        ) : (
+          <CustomizeWizard
+            productHandle={handle}
+            productTitle={medusaProduct.title}
+            productIcon={getIcon(handle)}
+            productPrice={priceLabel}
+            productType={getProductType(handle)}
+            variants={variants}
+          />
+        )}
       </main>
     );
   }

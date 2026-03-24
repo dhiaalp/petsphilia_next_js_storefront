@@ -64,6 +64,16 @@ const products = [
     type: "pc-hoodie",
     featured: false,
   },
+  {
+    id: "keychain",
+    handle: "custom-keychain",
+    title: "3D Pet Keychain",
+    desc: "Your pet transformed into a collectible 3D-printed resin keychain sculpture. A miniature masterpiece you can carry everywhere.",
+    tags: ["3D Printed", "Resin Sculpture", "Collectible"],
+    img: "/products/keychain.jpg",
+    type: "pc-keychain",
+    featured: false,
+  },
 ];
 
 const styleCards = [
@@ -152,6 +162,7 @@ export default async function HomePage() {
     medusaPriceByHandle.get("custom-mug")
     ?? medusaPriceByHandle.get("custom-tshirt")
     ?? medusaPriceByHandle.get("custom-hoodie")
+    ?? medusaPriceByHandle.get("custom-keychain")
     ?? "Unavailable";
 
   return (
@@ -419,6 +430,7 @@ export default async function HomePage() {
               <li><a href="/products/custom-mug">Custom Mug</a></li>
               <li><a href="/products/custom-tshirt">Custom T-Shirt</a></li>
               <li><a href="/products/custom-hoodie">Custom Hoodie</a></li>
+              <li><a href="/products/custom-keychain">3D Pet Keychain</a></li>
               <li><a href="/shop/">All Products</a></li>
             </ul>
           </div>
