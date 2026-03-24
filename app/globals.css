@@ -2163,11 +2163,37 @@ footer {
 
 .kw-3d-viewer-wrap {
   width: 100%;
-  max-width: 560px;
+  max-width: 640px;
   margin: 0 auto 24px;
-  border-radius: 16px;
+  position: relative;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.kw-viewer-controls-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
+}
+
+.kw-3d-viewer-wrap:active .kw-viewer-controls-hint,
+.kw-3d-viewer-wrap:hover .kw-viewer-controls-hint {
+  opacity: 0;
 }
 
 .kw-comparison {

@@ -493,7 +493,7 @@ export default function KeychainWizard({
         <div className="cw-step">
           <div className="cw-step-heading">
             <h1>Your 3D Keychain is Ready!</h1>
-            <p>Drag to rotate, pinch to zoom. This is your actual 3D keychain model.</p>
+            <p>Interact with your 3D model below — rotate, zoom, and inspect every angle.</p>
           </div>
 
           <div className="kw-3d-viewer-wrap">
@@ -502,18 +502,34 @@ export default function KeychainWizard({
               src={modelUrl}
               alt={`3D keychain of ${petName || "your pet"}`}
               auto-rotate
+              auto-rotate-delay="0"
+              rotation-per-second="30deg"
               camera-controls
               touch-action="pan-y"
+              interaction-prompt="auto"
+              interaction-prompt-threshold="0"
               poster={thumbnailUrl || undefined}
-              shadow-intensity="1"
+              shadow-intensity="1.2"
+              shadow-softness="0.8"
+              exposure="1.1"
               environment-image="neutral"
+              camera-orbit="0deg 75deg 105%"
+              min-camera-orbit="auto auto 50%"
+              max-camera-orbit="Infinity 150deg 300%"
+              field-of-view="30deg"
+              interpolation-decay="100"
               style={{
                 width: "100%",
-                height: "400px",
+                height: "500px",
                 borderRadius: "16px",
-                background: "linear-gradient(135deg, #f5f5f5, #e0e0e0)",
+                background: "radial-gradient(ellipse at center, #fafafa 0%, #e8e8e8 70%, #d4d4d4 100%)",
               }}
             />
+            <div className="kw-viewer-controls-hint">
+              <span>🖱 Drag to rotate</span>
+              <span>🔍 Scroll to zoom</span>
+              <span>⇧ + Drag to pan</span>
+            </div>
           </div>
 
           {sculptureImage && (
