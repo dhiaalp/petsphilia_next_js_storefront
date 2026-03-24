@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
+import dynamic from "next/dynamic";
 import { useState, useRef, useCallback, useEffect } from "react";
+
+const ModelViewer3D = dynamic(() => import("./model-viewer-3d"), { ssr: false });
 
 type Variant = {
   id: string;
@@ -289,11 +291,6 @@ export default function KeychainWizard({
 
   return (
     <div className="cw-wrapper">
-      <Script
-        src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
-        type="module"
-      />
-
       {/* Header */}
       <div className="cw-header">
         <Link href="/" className="cw-back">
@@ -496,41 +493,11 @@ export default function KeychainWizard({
             <p>Interact with your 3D model below — rotate, zoom, and inspect every angle.</p>
           </div>
 
-          <div className="kw-3d-viewer-wrap">
-            {/* @ts-expect-error model-viewer is a web component */}
-            <model-viewer
-              src={modelUrl}
-              alt={`3D keychain of ${petName || "your pet"}`}
-              auto-rotate
-              auto-rotate-delay="0"
-              rotation-per-second="30deg"
-              camera-controls
-              touch-action="pan-y"
-              interaction-prompt="auto"
-              interaction-prompt-threshold="0"
-              poster={thumbnailUrl || undefined}
-              shadow-intensity="1.2"
-              shadow-softness="0.8"
-              exposure="1.1"
-              environment-image="neutral"
-              camera-orbit="0deg 75deg 105%"
-              min-camera-orbit="auto auto 50%"
-              max-camera-orbit="Infinity 150deg 300%"
-              field-of-view="30deg"
-              interpolation-decay="100"
-              style={{
-                width: "100%",
-                height: "500px",
-                borderRadius: "16px",
-                background: "radial-gradient(ellipse at center, #fafafa 0%, #e8e8e8 70%, #d4d4d4 100%)",
-              }}
-            />
-            <div className="kw-viewer-controls-hint">
-              <span>🖱 Drag to rotate</span>
-              <span>🔍 Scroll to zoom</span>
-              <span>⇧ + Drag to pan</span>
-            </div>
-          </div>
+          <ModelViewer3D
+            modelUrl={modelUrl}
+            posterUrl={thumbnailUrl}
+            petName={petName}
+          />
 
           {sculptureImage && (
             <div className="kw-comparison">
