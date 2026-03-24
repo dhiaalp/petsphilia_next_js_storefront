@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
-const MESHY_API_BASE = "https://api.meshy.ai/openapi/v2";
+const MESHY_API_BASE = "https://api.meshy.ai/openapi/v1";
 
 const SCULPTURE_PROMPT = `Transform the uploaded pet photo into a full body stylized grey monocolor resin sculpture designed for high-quality 3D printing as a keychain.
 
@@ -142,6 +142,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         image_url: dataUrl,
+        ai_model: "meshy-6",
         enable_pbr: true,
         should_remesh: true,
         topology: "quad",
