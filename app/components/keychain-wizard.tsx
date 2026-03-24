@@ -82,8 +82,8 @@ export default function KeychainWizard({
     [handleFileSelect],
   );
 
-  // Step 1 → 2: Generate sculpture image via Gemini
-  const handleGenerateSculpture = async () => {
+  // Single call: Generate sculpture via Gemini + start Meshy 3D, all server-side
+  const handleGenerate = async () => {
     if (!photoFile) return;
 
     setGenerating(true);
@@ -113,66 +113,100 @@ export default function KeychainWizard({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Sculpture generation failed");
 
+      // Set sculpture preview
       setSculptureBase64(data.sculptureImage);
       setSculptureMime(data.sculptureMimeType);
       setSculptureImage(`data:${data.sculptureMimeType};base64,${data.sculptureImage}`);
-      setStep("preview-sculpture");
+      setGenerating(false);
+
+      // If Meshy task started successfully, begin polling
+      if (data.taskId) {
+        setStep("generate-3d");
+        setGenerating3d(true);
+        setMeshyTaskId(data.taskId);
+        startPolling(data.taskId);
+      } else {
+        // Meshy failed but sculpture is ready — show preview with option to retry
+        setStep("preview-sculpture");
+        if (data.meshyError) setError(data.meshyError);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setStep("upload");
-    } finally {
       setGenerating(false);
     }
   };
 
-  // Step 3 → 4: Send sculpture base64 directly to Meshy via our API
-  const handleGenerate3D = async () => {
-    if (!sculptureBase64) return;
+  const startPolling = (taskId: string) => {
+    pollRef.current = setInterval(async () => {
+      try {
+        const pollRes = await fetch(`/api/meshy?taskId=${taskId}`);
+        const pollData = await pollRes.json();
 
+        if (!pollRes.ok) return;
+
+        setMeshyProgress(pollData.progress);
+
+        if (pollData.status === "SUCCEEDED") {
+          if (pollRef.current) clearInterval(pollRef.current);
+          pollRef.current = null;
+          setModelUrl(pollData.modelUrl);
+          setThumbnailUrl(pollData.thumbnailUrl);
+          setGenerating3d(false);
+          setStep("preview-3d");
+        } else if (pollData.status === "FAILED" || pollData.status === "EXPIRED") {
+          if (pollRef.current) clearInterval(pollRef.current);
+          pollRef.current = null;
+          setGenerating3d(false);
+          setError("3D model generation failed. Please try again.");
+          setStep("preview-sculpture");
+        }
+      } catch {
+        // Silently retry on poll errors
+      }
+    }, 5000);
+  };
+
+  // Retry Meshy from the sculpture preview (if first attempt failed)
+  const handleRetryMeshy = async () => {
+    if (!sculptureBase64) return;
     setGenerating3d(true);
     setError(null);
     setStep("generate-3d");
 
     try {
-      // Send sculpture base64 directly — server forwards to Meshy as data URL
-      const meshyRes = await fetch("/api/meshy", {
+      // Re-send the original photo to regenerate everything server-side
+      // For retry, we need the original photo again
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(",")[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(photoFile!);
+      });
+
+      const res = await fetch("/api/meshy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sculptureBase64, sculptureMimeType: sculptureMime }),
+        body: JSON.stringify({
+          imageBase64: base64,
+          mimeType: photoFile!.type,
+        }),
       });
-      const meshyData = await meshyRes.json();
-      if (!meshyRes.ok) throw new Error(meshyData.error || "Failed to start 3D generation");
 
-      setMeshyTaskId(meshyData.taskId);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Generation failed");
 
-      // Start polling for completion
-      pollRef.current = setInterval(async () => {
-        try {
-          const pollRes = await fetch(`/api/meshy?taskId=${meshyData.taskId}`);
-          const pollData = await pollRes.json();
-
-          if (!pollRes.ok) return;
-
-          setMeshyProgress(pollData.progress);
-
-          if (pollData.status === "SUCCEEDED") {
-            if (pollRef.current) clearInterval(pollRef.current);
-            pollRef.current = null;
-            setModelUrl(pollData.modelUrl);
-            setThumbnailUrl(pollData.thumbnailUrl);
-            setGenerating3d(false);
-            setStep("preview-3d");
-          } else if (pollData.status === "FAILED" || pollData.status === "EXPIRED") {
-            if (pollRef.current) clearInterval(pollRef.current);
-            pollRef.current = null;
-            setGenerating3d(false);
-            setError("3D model generation failed. Please try again.");
-            setStep("preview-sculpture");
-          }
-        } catch {
-          // Silently retry on poll errors
-        }
-      }, 5000);
+      if (data.taskId) {
+        setMeshyTaskId(data.taskId);
+        startPolling(data.taskId);
+      } else {
+        setGenerating3d(false);
+        setError(data.meshyError || "Failed to start 3D generation");
+        setStep("preview-sculpture");
+      }
     } catch (err) {
       setGenerating3d(false);
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -381,7 +415,7 @@ export default function KeychainWizard({
             type="button"
             className="cw-next-btn"
             disabled={!photoPreview}
-            onClick={handleGenerateSculpture}
+            onClick={handleGenerate}
           >
             ✨ Generate 3D Sculpture <span className="arr">→</span>
           </button>
@@ -431,7 +465,7 @@ export default function KeychainWizard({
             <button
               type="button"
               className="cw-next-btn"
-              onClick={handleGenerate3D}
+              onClick={handleRetryMeshy}
             >
               🎯 Generate 3D Model <span className="arr">→</span>
             </button>

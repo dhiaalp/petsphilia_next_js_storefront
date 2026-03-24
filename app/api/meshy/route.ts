@@ -83,9 +83,9 @@ async function callGemini(apiKey: string, parts: Record<string, unknown>[]) {
 }
 
 /**
- * POST  - Two actions depending on body:
- *   1. { imageBase64, mimeType } → Generate sculpture via Gemini, return image
- *   2. { sculptureBase64, sculptureMimeType } → Send to Meshy as data URL, return taskId
+ * POST  - Generate sculpture via Gemini, then immediately submit to Meshy.
+ *         Returns both the sculpture preview image AND the Meshy taskId.
+ *         This avoids round-tripping the large base64 through the client.
  * GET   - Poll Meshy task status
  */
 export async function POST(req: NextRequest) {
@@ -101,43 +101,11 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { imageBase64, mimeType, sculptureBase64, sculptureMimeType } = body as {
-      imageBase64?: string;
-      mimeType?: string;
-      sculptureBase64?: string;
-      sculptureMimeType?: string;
+    const { imageBase64, mimeType } = body as {
+      imageBase64: string;
+      mimeType: string;
     };
 
-    // Action 2: Send sculpture to Meshy as a data URL
-    if (sculptureBase64 && sculptureMimeType) {
-      const dataUrl = `data:${sculptureMimeType};base64,${sculptureBase64}`;
-
-      const meshyRes = await fetch(`${MESHY_API_BASE}/image-to-3d`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${meshyKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image_url: dataUrl,
-          enable_pbr: true,
-          should_remesh: true,
-          topology: "quad",
-          target_polycount: 30000,
-        }),
-      });
-
-      if (!meshyRes.ok) {
-        const errText = await meshyRes.text();
-        console.error("Meshy API error:", meshyRes.status, errText);
-        return NextResponse.json({ error: "Failed to start 3D generation" }, { status: meshyRes.status });
-      }
-
-      const meshyData = await meshyRes.json();
-      return NextResponse.json({ taskId: meshyData.result });
-    }
-
-    // Action 1: Generate sculpture image from pet photo via Gemini
     if (!imageBase64 || !mimeType) {
       return NextResponse.json(
         { error: "Missing required fields: imageBase64 and mimeType" },
@@ -145,6 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Step 1: Generate sculpture image from pet photo via Gemini
     const sculptureResult = await callGemini(geminiKey, [
       { text: SCULPTURE_PROMPT },
       {
@@ -162,9 +131,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Step 2: Immediately send sculpture to Meshy as a data URL
+    const dataUrl = `data:${sculptureResult.mimeType};base64,${sculptureResult.image}`;
+
+    const meshyRes = await fetch(`${MESHY_API_BASE}/image-to-3d`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${meshyKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        image_url: dataUrl,
+        enable_pbr: true,
+        should_remesh: true,
+        topology: "quad",
+        target_polycount: 30000,
+      }),
+    });
+
+    if (!meshyRes.ok) {
+      const errText = await meshyRes.text();
+      console.error("Meshy API error:", meshyRes.status, errText);
+      // Still return the sculpture so user can see it, even if Meshy failed
+      return NextResponse.json({
+        sculptureImage: sculptureResult.image,
+        sculptureMimeType: sculptureResult.mimeType,
+        taskId: null,
+        meshyError: "Failed to start 3D generation. You can retry.",
+      });
+    }
+
+    const meshyData = await meshyRes.json();
+
     return NextResponse.json({
       sculptureImage: sculptureResult.image,
       sculptureMimeType: sculptureResult.mimeType,
+      taskId: meshyData.result,
     });
   } catch (err) {
     console.error("Meshy POST error:", err);
