@@ -18,10 +18,14 @@ function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
   // Clone scene and apply grey resin material to all meshes
   const clonedScene = useMemo(() => {
     const clone = scene.clone(true);
-    const mat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(0.42, 0.42, 0.44),
-      roughness: 0.5,
-      metalness: 0.08,
+    const mat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0.32, 0.34, 0.40),
+      roughness: 0.65,
+      metalness: 0.0,
+      clearcoat: 0.15,
+      clearcoatRoughness: 0.4,
+      sheen: 0.05,
+      sheenColor: new THREE.Color(0.4, 0.42, 0.5),
     });
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
