@@ -152,7 +152,11 @@ export default function KeychainWizard({
         if (pollData.status === "SUCCEEDED") {
           if (pollRef.current) clearInterval(pollRef.current);
           pollRef.current = null;
-          setModelUrl(pollData.modelUrl);
+          // Proxy the GLB through our API to avoid CORS
+          const proxiedUrl = pollData.modelUrl
+            ? `/api/meshy/model?url=${encodeURIComponent(pollData.modelUrl)}`
+            : null;
+          setModelUrl(proxiedUrl);
           setThumbnailUrl(pollData.thumbnailUrl);
           setGenerating3d(false);
           setStep("preview-3d");
