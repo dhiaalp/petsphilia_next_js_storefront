@@ -100,8 +100,8 @@ export default function ModelViewer3D({ modelUrl, petName }: Props) {
         }}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
       >
-        <color attach="background" args={["#f0f0f0"]} />
-        <fog attach="fog" args={["#f0f0f0", 8, 20]} />
+        <color attach="background" args={["#2a2a2e"]} />
+        <fog attach="fog" args={["#2a2a2e", 8, 20]} />
 
         {/* Key light — strong top-down to cast deep shadows */}
         <directionalLight
@@ -113,11 +113,13 @@ export default function ModelViewer3D({ modelUrl, petName }: Props) {
           shadow-bias={-0.001}
         />
         {/* Soft fill from front-left */}
-        <directionalLight position={[-3, 3, 4]} intensity={0.6} />
+        <directionalLight position={[-3, 3, 4]} intensity={0.8} />
         {/* Subtle rim light from behind */}
-        <directionalLight position={[2, 2, -3]} intensity={0.3} />
-        {/* Low ambient so shadows stay deep */}
-        <ambientLight intensity={0.15} />
+        <directionalLight position={[2, 2, -3]} intensity={0.4} />
+        {/* Ambient fill light */}
+        <ambientLight intensity={0.4} />
+        {/* Bottom fill to soften underside shadows */}
+        <hemisphereLight args={["#888888", "#333333", 0.5]} />
 
         <Suspense fallback={<Loader />}>
           <Model url={modelUrl} autoRotate={autoRotate} />
