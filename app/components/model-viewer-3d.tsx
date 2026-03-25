@@ -19,7 +19,7 @@ function Model({ url, autoRotate, onBounds }: { url: string; autoRotate: boolean
   const clonedScene = useMemo(() => {
     const clone = scene.clone(true);
     const mat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0.18431, 0.20000, 0.25098),
+      color: new THREE.Color("#5e5e5e"),
       roughness: 0.8,
       metalness: 0.0,
       clearcoat: 0.05,
@@ -113,13 +113,13 @@ export default function ModelViewer3D({ modelUrl, petName }: Props) {
           shadow-bias={-0.001}
         />
         {/* Soft fill from front-left */}
-        <directionalLight position={[-3, 3, 4]} intensity={0.8} />
+        <directionalLight position={[-3, 3, 4]} intensity={1.2} />
         {/* Subtle rim light from behind */}
-        <directionalLight position={[2, 2, -3]} intensity={0.4} />
+        <directionalLight position={[2, 2, -3]} intensity={0.7} />
         {/* Ambient fill light */}
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={0.7} />
         {/* Bottom fill to soften underside shadows */}
-        <hemisphereLight args={["#888888", "#333333", 0.5]} />
+        <hemisphereLight args={["#aaaaaa", "#444444", 0.8]} />
 
         <Suspense fallback={<Loader />}>
           <Model url={modelUrl} autoRotate={autoRotate} />
