@@ -11,11 +11,11 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
+function Model({ url, autoRotate, onBounds }: { url: string; autoRotate: boolean; onBounds?: (minY: number) => void }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
 
-  // Clone scene and apply grey resin material to all meshes
+  // Clone scene, apply material, and center on ground
   const clonedScene = useMemo(() => {
     const clone = scene.clone(true);
     const mat = new THREE.MeshPhysicalMaterial({
@@ -32,8 +32,18 @@ function Model({ url, autoRotate }: { url: string; autoRotate: boolean }) {
         (child as THREE.Mesh).material = mat;
       }
     });
+
+    // Center the model and place its base at Y=0
+    const box = new THREE.Box3().setFromObject(clone);
+    const center = box.getCenter(new THREE.Vector3());
+    const minY = box.min.y;
+    clone.position.set(-center.x, -minY, -center.z);
+
     return clone;
   }, [scene]);
+
+  // Report the ground Y once
+  useMemo(() => { onBounds?.(0); }, [onBounds]);
 
   useFrame((_, delta) => {
     if (autoRotate && ref.current) {
@@ -112,7 +122,7 @@ export default function ModelViewer3D({ modelUrl, petName }: Props) {
         <Suspense fallback={<Loader />}>
           <Model url={modelUrl} autoRotate={autoRotate} />
           <ContactShadows
-            position={[0, -0.5, 0]}
+            position={[0, 0, 0]}
             opacity={0.6}
             scale={5}
             blur={2}
