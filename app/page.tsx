@@ -70,7 +70,7 @@ const products = [
     title: "3D Pet Keychain",
     desc: "Your pet transformed into a collectible 3D-printed resin keychain sculpture. A miniature masterpiece you can carry everywhere.",
     tags: ["3D Printed", "Resin Sculpture", "Collectible"],
-    img: "/products/keychain.jpg",
+    img: "/products/keychain.png",
     type: "pc-keychain",
     featured: false,
   },
