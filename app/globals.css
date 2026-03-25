@@ -2285,6 +2285,107 @@ footer {
 }
 
 /* ============================================================
+   STATIC PAGES (About, Privacy, Terms)
+   ============================================================ */
+.static-page {
+  min-height: 100vh;
+  background: #fafafa;
+  color: #222;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.sp-nav {
+  display: flex;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+}
+
+.sp-logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #f97316;
+  text-decoration: none;
+}
+
+.sp-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.sp-content h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.sp-updated {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+.sp-content section {
+  margin-bottom: 32px;
+}
+
+.sp-content h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.sp-content p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+.sp-content ul {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.sp-content li {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.sp-content a {
+  color: #f97316;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sp-content a:hover {
+  color: #ea6a0a;
+}
+
+.sp-footer {
+  text-align: center;
+  padding: 24px;
+  border-top: 1px solid #eee;
+}
+
+.sp-footer a {
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.sp-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1100px) {
