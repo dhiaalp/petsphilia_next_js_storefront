@@ -15,8 +15,9 @@ Style:
 
 Face:
 - Preserve the pet's identity and expression
-- Add subtle eyelids and eye definition (no blank spheres)
-- Slightly stylized cute proportions
+- Big, cute, expressive eyes with clear iris and pupil detail — easy to hand-paint later
+- Well-defined eyelids and eye sockets with slight exaggeration for cuteness
+- Slightly stylized cute proportions (larger head-to-body ratio)
 - Eyes readable even at small size
 
 Geometry:
@@ -24,10 +25,12 @@ Geometry:
 - No thin or fragile parts
 - Remove whiskers or engrave them subtly
 - Clean topology, simplified forms
+- NO metal parts, chains, rings, or hardware — everything must be solid resin
+- The keychain loop must be part of the sculpt, not a separate metal piece
 
 Keychain:
-- Integrated loop at top, smoothly blended into the head
-- Strong and printable
+- Integrated solid resin loop at top, smoothly blended into the head
+- Strong and printable, no metal rings or chain links
 
 Material:
 - Single-color matte resin
