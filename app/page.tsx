@@ -252,9 +252,11 @@ export default async function HomePage() {
 
         <div className="shop-grid">
           {products.map((p, i) => (
-            <article
+            <a
               key={p.id}
+              href={`/customize/${p.handle}`}
               className={`shop-card ${p.featured ? "featured" : ""} reveal d${i + 1}`}
+              style={{ textDecoration: "none", color: "inherit", display: "block" }}
             >
               {p.featured && <div className="prod-pop">⭐ Most Popular</div>}
               <div className={`shop-card-media ${p.type}`}>
@@ -273,12 +275,12 @@ export default async function HomePage() {
                   <div className="prod-price">
                     {(medusaPriceByHandle.get(p.handle) ?? "Unavailable")} <small>/ piece</small>
                   </div>
-                  <a href={`/customize/${p.handle}`} className="btn-cust">
+                  <span className="btn-cust">
                     Customize <span className="arr">→</span>
-                  </a>
+                  </span>
                 </div>
               </div>
-            </article>
+            </a>
           ))}
         </div>
       </section>
