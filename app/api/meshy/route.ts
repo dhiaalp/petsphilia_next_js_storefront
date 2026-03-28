@@ -7,7 +7,7 @@ const MESHY_API_BASE = "https://api.meshy.ai/openapi/v1";
 const SCULPTURE_PROMPT = `Transform the uploaded pet photo into a full body stylized grey monocolor resin sculpture designed for high-quality 3D printing as a keychain.
 
 Style:
-- Clean sculpted collectible figurine style (not realistic scan)
+- Clean sculpted collectible figurine style (realistic scan)
 - Controlled fur texture with large soft sculpted clumps
 - Smooth surfaces with intentional detailing
 - No chaotic or noisy micro-details
@@ -15,11 +15,9 @@ Style:
 
 Face:
 - Preserve the pet's identity and expression
-- Very big, round, oversized eyes — Funko Pop / Chibi style proportions
-- Eyes must be perfectly spherical and protruding, with large circular iris and visible round pupil
+- big, round eyes
+- Eyes must be perfectly spherical and protruding
 - Deep sculpted eye sockets to define the eye shape clearly for hand-painting
-- Cute, exaggerated proportions (larger head-to-body ratio)
-- Eyes should be the dominant feature of the face
 - Readable and paintable even at small keychain size
 
 Geometry:
