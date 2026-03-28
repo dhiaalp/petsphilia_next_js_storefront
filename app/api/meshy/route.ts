@@ -15,10 +15,12 @@ Style:
 
 Face:
 - Preserve the pet's identity and expression
-- Big, cute, expressive eyes with clear iris and pupil detail — easy to hand-paint later
-- Well-defined eyelids and eye sockets with slight exaggeration for cuteness
-- Slightly stylized cute proportions (larger head-to-body ratio)
-- Eyes readable even at small size
+- Very big, round, oversized eyes — Funko Pop / Chibi style proportions
+- Eyes must be perfectly spherical and protruding, with large circular iris and visible round pupil
+- Deep sculpted eye sockets to define the eye shape clearly for hand-painting
+- Cute, exaggerated proportions (larger head-to-body ratio)
+- Eyes should be the dominant feature of the face
+- Readable and paintable even at small keychain size
 
 Geometry:
 - Thick, durable shapes suitable for resin printing
