@@ -140,7 +140,6 @@ export async function POST(req: NextRequest) {
         + `The artwork must look neatly fitted inside the printable area, smaller than the product, and never oversized. `
         + `Leave visible blank product space around the design so the mockup feels realistic and premium. `
         + `Do not crop the design, do not wrap it around edges, and do not let it dominate the whole product surface. `
-        + `${mockupTextInstruction} `
         + `The overall image should look like a professional product shot - realistic, well-lit, and ready for an online store. `
         + `The white product must be clearly visible with the original design, set against the orange gradient background.`;
 
