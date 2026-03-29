@@ -100,7 +100,8 @@ export async function POST(req: NextRequest) {
       + `The design should be centered and suitable for printing on products. `
       + `Keep the illustration compact with comfortable white margins on all sides, as if it will later be placed inside a print area. `
       + `Do not let the artwork fill the entire frame or touch the edges. `
-      + `This is just the design artwork - NOT on any product yet. Pure white background only.`;
+      + `This is just the design artwork - NOT on any product yet. Pure white background only. `
+      + `The output image MUST be a perfect square (1:1 aspect ratio).`;
 
     const artworkResult = await callGemini(apiKey, [
       { text: artworkPrompt },
@@ -144,7 +145,8 @@ export async function POST(req: NextRequest) {
         + `Leave visible blank product space around the design so the mockup feels realistic and premium. `
         + `Do not crop the design, do not wrap it around edges, and do not let it dominate the whole product surface. `
         + `The overall image should look like a professional product shot - realistic, well-lit, and ready for an online store. `
-        + `The white product must be clearly visible with the original design, set against the orange gradient background.`;
+        + `The white product must be clearly visible with the original design, set against the orange gradient background. `
+        + `The output image MUST be a perfect square (1:1 aspect ratio).`;
 
       const mockup = await callGemini(apiKey, [
         { text: mockupPrompt },
