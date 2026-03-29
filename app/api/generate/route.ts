@@ -87,10 +87,12 @@ export async function POST(req: NextRequest) {
       : "";
 
     // Step 1: Generate the design artwork on white background
-    const artworkPrompt = `Create a high-quality pet illustration based on the reference photo. `
+    const artworkPrompt = `Create a high-quality pet portrait illustration based on the reference photo. `
       + `Use this style: ${style}. `
-      + `Focus on the pet's unique features, eyes, fur texture, and personality. `
-      + `${textInstruction} `
+      + `Focus ONLY on the pet's head and face — do NOT include the body, legs, or tail. `
+      + `Capture the pet's unique facial features: eyes, ears, nose, fur texture, markings, and personality. `
+      + `The portrait should be a close-up head shot with expressive, detailed eyes. `
+      + `${textInstruction}${textInstruction ? ", add it seamlessly with design, integrate it with it using the same style. " : ""}`
       + `The background MUST be completely WHITE - clean, minimal, with no objects, no shadows, no textures. `
       + `The design should be centered and suitable for printing on products. `
       + `Keep the illustration compact with comfortable white margins on all sides, as if it will later be placed inside a print area. `
