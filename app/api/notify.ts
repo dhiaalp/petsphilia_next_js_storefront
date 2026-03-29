@@ -1,4 +1,4 @@
-const WHATSAPP_API = "https://graph.facebook.com/v21.0";
+const WHATSAPP_API = "https://graph.facebook.com/v22.0";
 
 export async function notifyWhatsApp(message: string) {
   const token = process.env.WHATSAPP_TOKEN;
