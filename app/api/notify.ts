@@ -1,6 +1,6 @@
 const WHATSAPP_API = "https://graph.facebook.com/v22.0";
 
-export async function notifyWhatsApp(message: string) {
+export async function notifyWhatsApp(_message: string) {
   const token = process.env.WHATSAPP_TOKEN;
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const toNumber = process.env.WHATSAPP_TO_NUMBER || "971585573621";
@@ -17,8 +17,11 @@ export async function notifyWhatsApp(message: string) {
       body: JSON.stringify({
         messaging_product: "whatsapp",
         to: toNumber,
-        type: "text",
-        text: { body: message },
+        type: "template",
+        template: {
+          name: "hello_world",
+          language: { code: "en_US" },
+        },
       }),
     });
   } catch (err) {
