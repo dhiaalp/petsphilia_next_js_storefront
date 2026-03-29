@@ -5,10 +5,13 @@ export async function notifyWhatsApp(_message: string) {
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
   const toNumber = process.env.WHATSAPP_TO_NUMBER || "971585573621";
 
-  if (!token || !phoneNumberId) return;
+  if (!token || !phoneNumberId) {
+    console.log("WhatsApp notification skipped: missing WHATSAPP_TOKEN or WHATSAPP_PHONE_NUMBER_ID");
+    return;
+  }
 
   try {
-    await fetch(`${WHATSAPP_API}/${phoneNumberId}/messages`, {
+    const res = await fetch(`${WHATSAPP_API}/${phoneNumberId}/messages`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,6 +27,13 @@ export async function notifyWhatsApp(_message: string) {
         },
       }),
     });
+
+    const data = await res.text();
+    if (!res.ok) {
+      console.error("WhatsApp API error:", res.status, data);
+    } else {
+      console.log("WhatsApp notification sent:", data);
+    }
   } catch (err) {
     console.error("WhatsApp notification failed:", err);
   }

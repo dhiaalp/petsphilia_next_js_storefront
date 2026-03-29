@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
     }
 
     const productLabel = product || "unknown";
-    notifyWhatsApp(
+    await notifyWhatsApp(
       `🎨 New design generated!\nProduct: ${productLabel}\nPet name: ${petName || "N/A"}\nStyle: ${style}`
     );
 

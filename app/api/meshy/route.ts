@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
     const meshyData = await meshyRes.json();
 
-    notifyWhatsApp(
+    await notifyWhatsApp(
       `🔑 New 3D Keychain generated!\nMeshy Task: ${meshyData.result}\nA customer is creating a custom keychain.`
     );
 
