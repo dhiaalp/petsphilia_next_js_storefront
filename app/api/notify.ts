@@ -1,40 +1,32 @@
-const WHATSAPP_API = "https://graph.facebook.com/v22.0";
+const TELEGRAM_API = "https://api.telegram.org";
 
-export async function notifyWhatsApp(_message: string) {
-  const token = process.env.WHATSAPP_TOKEN;
-  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const toNumber = process.env.WHATSAPP_TO_NUMBER || "971585573621";
+export async function notifyWhatsApp(message: string) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
 
-  if (!token || !phoneNumberId) {
-    console.log("WhatsApp notification skipped: missing WHATSAPP_TOKEN or WHATSAPP_PHONE_NUMBER_ID");
+  if (!botToken || !chatId) {
+    console.log("Telegram notification skipped: missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID");
     return;
   }
 
   try {
-    const res = await fetch(`${WHATSAPP_API}/${phoneNumberId}/messages`, {
+    const res = await fetch(`${TELEGRAM_API}/bot${botToken}/sendMessage`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to: toNumber,
-        type: "template",
-        template: {
-          name: "hello_world",
-          language: { code: "en_US" },
-        },
+        chat_id: chatId,
+        text: message,
+        parse_mode: "HTML",
       }),
     });
 
     const data = await res.text();
     if (!res.ok) {
-      console.error("WhatsApp API error:", res.status, data);
+      console.error("Telegram API error:", res.status, data);
     } else {
-      console.log("WhatsApp notification sent:", data);
+      console.log("Telegram notification sent");
     }
   } catch (err) {
-    console.error("WhatsApp notification failed:", err);
+    console.error("Telegram notification failed:", err);
   }
 }
