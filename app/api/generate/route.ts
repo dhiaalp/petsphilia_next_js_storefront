@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notifyWhatsApp } from "../notify";
 
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
@@ -157,6 +158,11 @@ export async function POST(req: NextRequest) {
         mockupResult = { image: mockup.image, mimeType: mockup.mimeType };
       }
     }
+
+    const productLabel = product || "unknown";
+    notifyWhatsApp(
+      `🎨 New design generated!\nProduct: ${productLabel}\nPet name: ${petName || "N/A"}\nStyle: ${style}`
+    );
 
     return NextResponse.json({
       image: artworkResult.image,

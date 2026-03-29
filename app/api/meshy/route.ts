@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { notifyWhatsApp } from "../notify";
 
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
@@ -164,6 +165,10 @@ export async function POST(req: NextRequest) {
     }
 
     const meshyData = await meshyRes.json();
+
+    notifyWhatsApp(
+      `🔑 New 3D Keychain generated!\nMeshy Task: ${meshyData.result}\nA customer is creating a custom keychain.`
+    );
 
     return NextResponse.json({
       sculptureImage: sculptureResult.image,
