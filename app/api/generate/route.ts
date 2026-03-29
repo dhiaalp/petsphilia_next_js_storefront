@@ -88,8 +88,10 @@ export async function POST(req: NextRequest) {
       : "";
 
     // Step 1: Generate the design artwork on white background
+    const isTattoo = style.toLowerCase().includes("tattoo");
     const artworkPrompt = `Create a high-quality pet portrait illustration based on the reference photo. `
       + `Use this style: ${style}. `
+      + (isTattoo ? `The design MUST be strictly black and white only — no colors, no grey tones, pure black ink on white background. Use bold black linework, stippling, and crosshatching for shading. ` : ``)
       + `Focus ONLY on the pet's head and face — do NOT include the body, legs, or tail. `
       + `Capture the pet's unique facial features: eyes, ears, nose, fur texture, markings, and personality. `
       + `The portrait should be a close-up head shot with expressive, detailed eyes. `
