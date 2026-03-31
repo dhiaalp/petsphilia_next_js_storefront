@@ -239,6 +239,40 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── GALLERY ── */}
+      <section className="home-section gallery-section" id="gallery">
+        <div className="home-section-heading reveal">
+          <span className="section-kicker">Customer Creations</span>
+          <h2>Made with Petsphilia</h2>
+          <p>Real pets, real products — created by our community.</p>
+        </div>
+        <div className="gallery-grid">
+          {[
+            { src: "/gallery/mug1.jpg", label: "Custom Mug" },
+            { src: "/gallery/tshirt1.jpg", label: "Custom T-Shirt" },
+            { src: "/gallery/hoodie1.jpg", label: "Custom Hoodie" },
+            { src: "/gallery/keychain1.jpg", label: "3D Keychain" },
+            { src: "/gallery/mug2.jpg", label: "Custom Mug" },
+            { src: "/gallery/tshirt2.jpg", label: "Custom T-Shirt" },
+            { src: "/gallery/keychain2.jpg", label: "3D Keychain" },
+            { src: "/gallery/hoodie2.jpg", label: "Custom Hoodie" },
+            { src: "/gallery/mug3.jpg", label: "Custom Mug" },
+            { src: "/gallery/tshirt3.jpg", label: "Custom T-Shirt" },
+            { src: "/gallery/keychain3.jpg", label: "3D Keychain" },
+          ].map((item, i) => (
+            <div key={i} className={`gallery-item reveal d${(i % 4) + 1}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={item.src} alt={item.label} loading="lazy" />
+              <span className="gallery-label">{item.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="gallery-cta reveal">
+          <p>Your pet could be next.</p>
+          <a href="#products" className="btn-primary">Create Yours Now →</a>
+        </div>
+      </section>
+
       {/* ── PRODUCTS ── */}
       <section className="home-section" id="products">
         <div className="home-section-heading reveal">
@@ -336,36 +370,6 @@ export default async function HomePage() {
               </div>
               <h3>{style.name}</h3>
               <p>{style.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── GALLERY ── */}
-      <section className="home-section gallery-section" id="gallery">
-        <div className="home-section-heading reveal">
-          <span className="section-kicker">Customer Creations</span>
-          <h2>Made with Petsphilia</h2>
-          <p>Real pets, real products — created by our community.</p>
-        </div>
-        <div className="gallery-grid">
-          {[
-            { src: "/gallery/mug1.jpg", label: "Custom Mug" },
-            { src: "/gallery/tshirt1.jpg", label: "Custom T-Shirt" },
-            { src: "/gallery/hoodie1.jpg", label: "Custom Hoodie" },
-            { src: "/gallery/keychain1.png", label: "3D Keychain" },
-            { src: "/gallery/mug2.jpg", label: "Custom Mug" },
-            { src: "/gallery/tshirt2.jpg", label: "Custom T-Shirt" },
-            { src: "/gallery/keychain2.png", label: "3D Keychain" },
-            { src: "/gallery/hoodie2.jpg", label: "Custom Hoodie" },
-            { src: "/gallery/mug3.jpg", label: "Custom Mug" },
-            { src: "/gallery/tshirt3.jpg", label: "Custom T-Shirt" },
-            { src: "/gallery/keychain3.png", label: "3D Keychain" },
-          ].map((item, i) => (
-            <div key={i} className={`gallery-item reveal d${(i % 4) + 1}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.src} alt={item.label} loading="lazy" />
-              <span className="gallery-label">{item.label}</span>
             </div>
           ))}
         </div>
