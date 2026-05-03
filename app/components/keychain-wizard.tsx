@@ -109,6 +109,7 @@ export default function KeychainWizard({
         body: JSON.stringify({
           imageBase64: base64,
           mimeType: photoFile.type,
+          petName: petName.trim() || undefined,
         }),
       });
 
@@ -199,6 +200,7 @@ export default function KeychainWizard({
         body: JSON.stringify({
           imageBase64: base64,
           mimeType: photoFile!.type,
+          petName: petName.trim() || undefined,
         }),
       });
 

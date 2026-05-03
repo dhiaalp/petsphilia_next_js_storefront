@@ -102,9 +102,10 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { imageBase64, mimeType } = body as {
+    const { imageBase64, mimeType, petName } = body as {
       imageBase64: string;
       mimeType: string;
+      petName?: string;
     };
 
     if (!imageBase64 || !mimeType) {
@@ -114,9 +115,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const namePrompt = petName?.trim()
+      ? `\n\nName:\n- Add the name "${petName.trim()}" as a necklace on the sculpture. It must be readable with a rounded friendly font. The letters must be showed freely without a base plate.`
+      : "";
+    const finalPrompt = SCULPTURE_PROMPT + namePrompt;
+
     // Step 1: Generate sculpture image from pet photo via Gemini
     const sculptureResult = await callGemini(geminiKey, [
-      { text: SCULPTURE_PROMPT },
+      { text: finalPrompt },
       {
         inline_data: {
           mime_type: mimeType,
