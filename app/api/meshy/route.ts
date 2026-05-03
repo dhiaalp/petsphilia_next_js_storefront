@@ -9,23 +9,20 @@ const SCULPTURE_PROMPT = `Transform the uploaded pet photo into a full body styl
 
 Style:
 - Clean sculpted collectible figurine style (realistic scan)
-- Controlled fur texture with large soft sculpted clumps
-- Smooth surfaces with intentional detailing
+-high quality fur texture
+- surfaces with intentional detailing
 - No chaotic or noisy micro-details
 - Premium designer toy / collectible sculpture look
 
 Face:
 - Preserve the pet's identity and expression
-- big, round eyes
-- Eyes must be perfectly spherical and protruding
-- Deep sculpted eye sockets to define the eye shape clearly for hand-painting
-- Readable and paintable even at small keychain size
+- realistic eyes
 
 Geometry:
 - Thick, durable shapes suitable for resin printing
 - No thin or fragile parts
 - Remove whiskers or engrave them subtly
-- Clean topology, simplified forms
+-realistic complex forms
 - NO metal parts, chains, rings, or hardware — everything must be solid resin
 - The keychain loop must be part of the sculpt, not a separate metal piece
 
