@@ -16,7 +16,7 @@ Style:
 
 Face:
 - Preserve the pet's identity and expression
-- realistic eyes
+- realistic glossy eyes, the color must be grey the same as the entire model
 
 Geometry:
 - Thick, durable shapes suitable for resin printing
@@ -24,7 +24,7 @@ Geometry:
 - Remove whiskers or engrave them subtly
 -realistic complex forms
 - NO metal parts, chains, rings, or hardware — everything must be solid resin
-- The keychain loop must be part of the sculpt, not a separate metal piece
+- The keychain loop must be part of the sculpt, not a separate metal piece, semi donut shape
 
 Keychain:
 - Integrated solid resin loop at top, smoothly blended into the head
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
     }
 
     const namePrompt = petName?.trim()
-      ? `\n\nName:\n- Add the name "${petName.trim()}" as a necklace on the sculpture. It must be readable with a rounded friendly font. The letters must be showed freely without a base plate.`
+      ? `\n\nName:\n- Add the name "${petName.trim()}" in a proportional size as a necklace. It must be readable with a rounded friendly font. The letters must be showed freely without a base plate.`
       : "";
     const finalPrompt = SCULPTURE_PROMPT + namePrompt;
 
