@@ -3,14 +3,27 @@ import { notifyWhatsApp } from "../notify";
 
 const GEMINI_API_URL =
   "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent";
+const GEMINI_VISION_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 const MESHY_API_BASE = "https://api.meshy.ai/openapi/v1";
 
-const SCULPTURE_PROMPT = `Transform the uploaded pet photo into a full body stylized grey monocolor resin sculpture designed for high-quality 3D printing as a keychain.
+type FurDensity = "dense" | "minimal" | "moderate";
+
+const FUR_STYLES: Record<FurDensity, string> = {
+  dense: `- Simplified smooth fur: large soft sculpted clumps, broad flowing surfaces
+- Avoid micro-detail noise — prioritise clean readable shapes`,
+  minimal: `- Fine detailed fur texture with realistic strand groupings
+- Complex surface patterns and skin fold detail to add richness`,
+  moderate: `-high quality fur texture
+- surfaces with intentional detailing`,
+};
+
+function buildSculpturePrompt(furDensity: FurDensity): string {
+  return `Transform the uploaded pet photo into a full body stylized grey monocolor resin sculpture designed for high-quality 3D printing as a keychain.
 
 Style:
 - Clean sculpted collectible figurine style (realistic scan)
--high quality fur texture
-- surfaces with intentional detailing
+${FUR_STYLES[furDensity]}
 - No chaotic or noisy micro-details
 - Premium designer toy / collectible sculpture look
 
@@ -44,6 +57,36 @@ Output:
 Important:
 - Must look like a handcrafted sculpt, not AI noise
 - Must be manufacturable and durable`;
+}
+
+async function analyzeFurDensity(apiKey: string, imageBase64: string, mimeType: string): Promise<FurDensity> {
+  try {
+    const res = await fetch(`${GEMINI_VISION_URL}?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              text: `Look at this pet photo and classify its coat as exactly one word: "dense" (thick, fluffy, long, bushy, or heavy double coat), "minimal" (short, smooth, fine, sleek, sparse, or hairless), or "moderate" (medium length or average thickness). Reply with only that one word.`,
+            },
+            { inline_data: { mime_type: mimeType, data: imageBase64 } },
+          ],
+        }],
+        generationConfig: { maxOutputTokens: 5 },
+      }),
+    });
+
+    if (!res.ok) return "moderate";
+    const data = await res.json();
+    const text: string = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toLowerCase() ?? "";
+    if (text.includes("dense")) return "dense";
+    if (text.includes("minimal")) return "minimal";
+    return "moderate";
+  } catch {
+    return "moderate";
+  }
+}
 
 async function callGemini(apiKey: string, parts: Record<string, unknown>[]) {
   const res = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
@@ -115,10 +158,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const furDensity = await analyzeFurDensity(geminiKey, imageBase64, mimeType);
+
     const namePrompt = petName?.trim()
       ? `\n\nName:\n- Add the name "${petName.trim()}" in a proportional size as a necklace. It must be readable with a rounded friendly font. The letters must be showed freely without a base plate.`
       : "";
-    const finalPrompt = SCULPTURE_PROMPT + namePrompt;
+    const finalPrompt = buildSculpturePrompt(furDensity) + namePrompt;
 
     // Step 1: Generate sculpture image from pet photo via Gemini
     const sculptureResult = await callGemini(geminiKey, [
